@@ -267,7 +267,7 @@ function selectDeclines($my_id)
 function selectEmailAndPasswordLogInProcess($u_email, $u_password)
 {
     $sql = "SELECT * FROM `users` WHERE u_email=? AND u_password=? ";
-    $loggedInUser = get_record($sql, [$u_email, $u_password]);
+    $loggedInUser = get_record($sql, [$u_email, md5($u_password)]);
     if ($loggedInUser === false) {
         return false;
     }
