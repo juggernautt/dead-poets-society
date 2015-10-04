@@ -43,7 +43,6 @@ if (isset($_SESSION['loggedInUser'])) {
                 <div class="form-group pass">
                     <label for="password1">Password</label>
                     <input type="password" class="form-control" name=" u_password" id="password1"
-                           value="<?php if (isset($user['u_password'])) print $user['u_password']; ?>"
                            placeholder="Password" required pattern="[a-zA-Z0-9]+">
                 </div>
                 <div class="errors" id="password-error"></div>

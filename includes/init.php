@@ -9,5 +9,7 @@ $this_folder = dirname(__FILE__);
 $new_include_path = "{$this_folder}:{$include_path}";
 set_include_path($new_include_path);
 
+date_default_timezone_set('Asia/Jerusalem');
+
 require_once('functions.php');
 require_once('constants.php');
