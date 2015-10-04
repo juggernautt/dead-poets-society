@@ -1,0 +1,9 @@
+<?php
+
+define("NO_RELATIONSHIP", "NO RELATIONSHIP");
+define("FRIENDS", "FRIENDS");
+define("MINE_REQUEST", "MINE REQUEST");
+define("HIS_REQUEST", "HIS REQUEST");
+define("MINE_DECLINE", "MINE DECLINE");
+define("HIS_DECLINE", "HIS DECLINE");
+define("SECONDS_IN_DAY", 60*60*24);
