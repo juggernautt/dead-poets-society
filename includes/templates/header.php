@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once($_SERVER['DOCUMENT_ROOT'].'/../includes/init.php');
+require_once($_SERVER['DOCUMENT_ROOT'] . '/../includes/init.php');
 ?>
 
 <!DOCTYPE html>
@@ -19,15 +19,18 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../includes/init.php');
 <header>
 
 
-        <nav>
-            <div>
-                <?php if (isset($_SESSION['loggedInUser'])) { ?>
-                    <span class="logout">
+    <nav>
+        <div>
+            <?php if (isset($_SESSION['loggedInUser'])) { ?>
+                <span class="logout">
                     <img src="<?= getUserPic($_SESSION['loggedInUser']['u_picture']); ?>" width="35"
                          height="45"><?= $_SESSION['loggedInUser']['u_nickname']; ?>
-                        <a href="/logout.php">Log out</a>
+                    <a href="/logout.php">Log out</a>
             </span>
-                <?php } ?>
+            <?php }
+
+            if (!isset($hideMenu)) { ?>
+
                 <ul class="nav nav-tabs right">
                     <li role="presentation"><a href="/index.php">Home</a></li>
                     <li role="presentation"><a href="/friends.php?show=all">Find Friends</a></li>
@@ -35,14 +38,16 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../includes/init.php');
                     <li role="presentation"><a href="/relationship.php">Relationships</a></li>
                     <li role="presentation"><a href="/userinfo.php">Settings</a></li>
                 </ul>
-            </div>
-        </nav>
+            <?php } ?>
+        </div>
+    </nav>
     <div class="container" id="logo">
-            <a href="/index.php"><img src="/images/poe.jpg" width="100" height="100"></a>
-            <h1>Dead Poets Society
-                <small>Anti social network</small>
-            </h1>
-            <span>The country of poets and thinkers</span>
+        <a href="/index.php"><img src="/images/poe.jpg" width="100" height="100"></a>
+
+        <h1>Dead Poets Society
+            <small>Anti social network</small>
+        </h1>
+        <span>The country of poets and thinkers</span>
     </div>
 
 </header>

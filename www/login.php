@@ -1,5 +1,6 @@
 <?php
 $title = 'Login';
+$hideMenu = true;
 require_once($_SERVER['DOCUMENT_ROOT'].'/../includes/init.php');
 require_once('templates/header.php');
 require_once('lib/businessLogic.php');
