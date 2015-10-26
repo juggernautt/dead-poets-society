@@ -25,7 +25,7 @@ function selectUser($u_id)
 function createNewPost($u_id, $p_text)
 {
     $p = new Post($u_id, $p_text);
-    return $p->saveToDbAndGet();
+    return $p->createAndGet();
 }
 
 /**

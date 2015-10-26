@@ -87,7 +87,7 @@ class Post
     /**
      * @return array | false - ID of inserted new post
      */
-    public function saveToDbAndGet()
+    public function createAndGet()
     {
         $sql = "INSERT INTO `posts` (u_id, p_text) VALUES (?, ?)";
         $insertedId = insert($sql, [$this->u_id, $this->p_text]);
