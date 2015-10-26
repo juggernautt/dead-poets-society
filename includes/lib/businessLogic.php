@@ -1,5 +1,6 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT'].'/../includes/init.php');
+require_once('lib/Post.class.php');
 require_once('lib/DAL.php');
 
 /**
@@ -17,36 +18,14 @@ function selectUser($u_id)
 }
 
 /**
- * @param $p_id
- * @return array|false
- */
-function selectPost($p_id)
-{
-    $sql = "SELECT * FROM `posts` WHERE p_id= ?";
-    $post = get_record($sql, [$p_id]);
-    if ($post === false) {
-        return false;
-    }
-    return $post;
-}
-
-/**
  * @param int $u_id
  * @param string $p_text
  * @return array|false
  */
 function createNewPost($u_id, $p_text)
 {
-    if ($p_text === "") {
-        return false;
-    }
-    $sql = "INSERT INTO `posts` (u_id, p_text) VALUES (?, ?)";
-    $insertedId = insert($sql, [$u_id, $p_text]);
-    if (!$insertedId) {
-        return false;
-    }
-    $selectAddedPost = selectPost($insertedId);
-    return $selectAddedPost;
+    $p = new Post($u_id, $p_text);
+    return $p->saveToDbAndGet();
 }
 
 /**
