@@ -1,6 +1,7 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT'].'/../includes/init.php');
 require_once('lib/Post.class.php');
+require_once('lib/User.class.php');
 require_once('lib/DAL.php');
 
 /**
@@ -276,24 +277,24 @@ function selectEmail($u_email)
  * @param $isToCheckMail
  * @return array
  */
-function formValidation($u_email, $u_password, $u_nickname, $u_birthdate, $isToCheckMail)
-{
-    $errors = array();
-    if ($u_email == "" || $u_password == "" || $u_nickname == "" || $u_birthdate == "") {
-        $errors['non_empty'] = "Email, password, username and birthday should not be empty";
-    }
-    if (!preg_match("/([A-Za-z0-9]+)/", $u_password)) {
-        $errors['u_password'] = "Only letters and numbers allowed";
-    }
-    if ($isToCheckMail) {
-        $result = selectEmail($u_email);
-        if ($result) {
-            $errors['u_email'] = "Your email should be unique";
-        }
-    }
-    return $errors;
-
-}
+//function formValidation($u_email, $u_password, $u_nickname, $u_birthdate, $isToCheckMail)
+//{
+//    $errors = array();
+//    if ($u_email == "" || $u_password == "" || $u_nickname == "" || $u_birthdate == "") {
+//        $errors['non_empty'] = "Email, password, username and birthday should not be empty";
+//    }
+//    if (!preg_match("/([A-Za-z0-9]+)/", $u_password)) {
+//        $errors['u_password'] = "Only letters and numbers allowed";
+//    }
+//    if ($isToCheckMail) {
+//        $result = selectEmail($u_email);
+//        if ($result) {
+//            $errors['u_email'] = "Your email should be unique";
+//        }
+//    }
+//    return $errors;
+//
+//}
 
 /**
  * @param $u_email
@@ -307,17 +308,21 @@ function formValidation($u_email, $u_password, $u_nickname, $u_birthdate, $isToC
  */
 function addNewUser($u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself, $u_picture, $u_secret_pic)
 {
-    $errors = formValidation($u_email, $u_password, $u_nickname, $u_birthdate, TRUE);
-    if (count($errors) == 0) {
-        $sql = "INSERT INTO `users` (u_email, u_password, u_nickname, u_birthdate, u_about_myself, u_picture, u_secret_pic) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        $insert = insert($sql, [$u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself, $u_picture, $u_secret_pic]);
-        if (!$insert) {
-            return false;
-        }
-        $newUser = selectEmailAndPasswordLogInProcess($u_email, $u_password);
-        return $newUser;
-    }
-    return $errors;
+//    $errors = formValidation($u_email, $u_password, $u_nickname, $u_birthdate, TRUE);
+//    if (count($errors) == 0) {
+//        $sql = "INSERT INTO `users` (u_email, u_password, u_nickname, u_birthdate, u_about_myself, u_picture, u_secret_pic) VALUES (?, ?, ?, ?, ?, ?, ?)";
+//        $insert = insert($sql, [$u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself, $u_picture, $u_secret_pic]);
+//        if (!$insert) {
+//            return false;
+//        }
+//        $newUser = selectEmailAndPasswordLogInProcess($u_email, $u_password);
+//        return $newUser;
+//    }
+//    return $errors;
+    $u = new User($u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself, $u_picture, $u_secret_pic);
+    return $u->createAndGet();
+
+
 }
 
 /**
@@ -333,7 +338,6 @@ function addNewUser($u_email, $u_password, $u_nickname, $u_birthdate, $u_about_m
  */
 function updateExistingUser($u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself, $u_picture, $u_secret_pic, $u_id)
 {
-
     $errors = formValidation($u_email, $u_password, $u_nickname, $u_birthdate, FALSE);
     if (count($errors) == 0) {
         $values = [$u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself];
