@@ -254,115 +254,23 @@ function selectEmailAndPasswordLogInProcess($u_email, $u_password)
     return $loggedInUser;
 }
 
-/**
- * @param string $u_email
- * @return array|false
- */
-function selectEmail($u_email)
-{
-    $sql = "SELECT * FROM `users` WHERE u_email=?";
-    $email = get_record($sql, [$u_email]);
-    if ($email === false) {
-        return false;
-    }
-    return $email;
-}
 
 
-/**
- * @param $u_email
- * @param $u_password
- * @param $u_nickname
- * @param $u_birthdate
- * @param $isToCheckMail
- * @return array
- */
-//function formValidation($u_email, $u_password, $u_nickname, $u_birthdate, $isToCheckMail)
-//{
-//    $errors = array();
-//    if ($u_email == "" || $u_password == "" || $u_nickname == "" || $u_birthdate == "") {
-//        $errors['non_empty'] = "Email, password, username and birthday should not be empty";
-//    }
-//    if (!preg_match("/([A-Za-z0-9]+)/", $u_password)) {
-//        $errors['u_password'] = "Only letters and numbers allowed";
-//    }
-//    if ($isToCheckMail) {
-//        $result = selectEmail($u_email);
-//        if ($result) {
-//            $errors['u_email'] = "Your email should be unique";
-//        }
-//    }
-//    return $errors;
-//
-//}
 
-/**
- * @param $u_email
- * @param $u_password
- * @param $u_nickname
- * @param $u_birthdate
- * @param $u_about_myself
- * @param $u_picture
- * @param $u_secret_pic
- * @return array|false
- */
+
+
 function addNewUser($u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself, $u_picture, $u_secret_pic)
 {
-//    $errors = formValidation($u_email, $u_password, $u_nickname, $u_birthdate, TRUE);
-//    if (count($errors) == 0) {
-//        $sql = "INSERT INTO `users` (u_email, u_password, u_nickname, u_birthdate, u_about_myself, u_picture, u_secret_pic) VALUES (?, ?, ?, ?, ?, ?, ?)";
-//        $insert = insert($sql, [$u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself, $u_picture, $u_secret_pic]);
-//        if (!$insert) {
-//            return false;
-//        }
-//        $newUser = selectEmailAndPasswordLogInProcess($u_email, $u_password);
-//        return $newUser;
-//    }
-//    return $errors;
     $u = new User($u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself, $u_picture, $u_secret_pic);
     return $u->createAndGet();
-
-
 }
 
-/**
- * @param $u_email
- * @param $u_password
- * @param $u_nickname
- * @param $u_birthdate
- * @param $u_about_myself
- * @param $u_picture
- * @param $u_secret_pic
- * @param $u_id
- * @return array|false
- */
+
 function updateExistingUser($u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself, $u_picture, $u_secret_pic, $u_id)
 {
-    $errors = formValidation($u_email, $u_password, $u_nickname, $u_birthdate, FALSE);
-    if (count($errors) == 0) {
-        $values = [$u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself];
-        $sql = "UPDATE `users` SET u_email=?, u_password=?, u_nickname=?, u_birthdate=?, u_about_myself=?";
-        //check if the user updates his pictures
-        if ($u_picture) {
-            array_push($values, $u_picture);
-            $sql .= ", u_picture=?";
-        }
-        if ($u_secret_pic) {
-            array_push($values, $u_secret_pic);
-            $sql .= ", u_secret_pic=?";
-        }
-        array_push($values, $u_id);
-        $sql .= " WHERE u_id=?";
-
-        $update = update($sql, $values);
-        if ($update === false) {
-            return false;
-        }
-        $existingUser = selectUser($u_id);
-        return $existingUser;
-    }
-
-    return $errors;
+    $u2 = new User($u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself, $u_picture, $u_secret_pic);
+    $u2->setUId($u_id);
+    return $u2->updateAndGet();
 }
 
 /**

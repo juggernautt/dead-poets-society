@@ -4,6 +4,15 @@ require_once('lib/DAL.php');
 
 class User
 {
+    private $props = array();
+
+    public function setProps($props) {
+    }
+
+    public function getProps($props) {
+        return $this->props;
+    }
+
     private $u_id;
     private $u_email;
     private $u_password;
@@ -24,6 +33,17 @@ class User
         $this->setUSecretPic($u_secret_pic);
     }
 
+
+    public function getUId()
+    {
+        return $this->u_id;
+    }
+
+
+    public function setUId($u_id)
+    {
+        $this->u_id = $u_id;
+    }
 
     public function getUEmail()
     {
@@ -163,20 +183,13 @@ class User
             if ($updatedRows === false) {
                 return false;
             }
-            $sql = "SELECT * FROM `users` WHERE u_id=?";
-            $existingUser = get_record($sql, [$this->u_id]);
+            $existingUser = $this->selectUserById();
             return $existingUser;
         }
         return $errors;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getUId()
-    {
-        return $this->u_id;
-    }
+
 
     public function getErrors($isToCheckMail) {
         $errors = array();
@@ -207,6 +220,15 @@ class User
         return $loggedInUser;
     }
 
+    function selectUserById()
+    {
+        $sql = "SELECT * FROM `users` WHERE u_id=? ";
+        $user = get_record($sql, [$this->u_id]);
+        if ($user === false) {
+            return false;
+        }
+        return $user;
+    }
 
 
 }

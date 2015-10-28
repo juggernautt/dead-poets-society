@@ -83,7 +83,7 @@ if ($action == "Form Filling")
     $birthday = isset($_POST['u_birthdate']) ? $_POST['u_birthdate'] : "";
     $about = isset($_POST['u_about_myself']) ? $_POST['u_about_myself'] : "";
     $publicPicture = $secretPicture = "";
-    $id = isset($_POST['u_id']) ? ($_POST['u_id']) : null;
+    $id = isset($_SESSION['loggedInUser']['u_id']) ? ($_SESSION['loggedInUser']['u_id']) : null;
 
     if ($_FILES) {
         $publicPicture = move_files($_FILES['file1']);
