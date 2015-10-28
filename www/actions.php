@@ -75,24 +75,18 @@ if ($action == "Regret button")
 
 if ($action == "Form Filling")
 {
-
-    $email = isset($_POST['u_email']) ? $_POST['u_email'] : "";
-    $password = isset($_POST['u_password']) ? $_POST['u_password'] : "";
-    $password = md5($password);
-    $nickname = isset($_POST['u_nickname']) ? $_POST['u_nickname'] : "";
-    $birthday = isset($_POST['u_birthdate']) ? $_POST['u_birthdate'] : "";
-    $about = isset($_POST['u_about_myself']) ? $_POST['u_about_myself'] : "";
-    $publicPicture = $secretPicture = "";
-    $id = isset($_SESSION['loggedInUser']['u_id']) ? ($_SESSION['loggedInUser']['u_id']) : null;
+    $props = $_POST;
+    $props['u_id'] = isset($_SESSION['loggedInUser']['u_id']) ? ($_SESSION['loggedInUser']['u_id']) : null;
+    $props['u_password'] = md5($props['u_password']);
 
     if ($_FILES) {
-        $publicPicture = move_files($_FILES['file1']);
-        $secretPicture = move_files($_FILES['file2']);
+        $props['u_picture'] = move_files($_FILES['file1']);
+        $props['u_secret_pic'] = move_files($_FILES['file2']);
     }
-    if (!$id) {
-        $resultArr = addNewUser($email, $password, $nickname, $birthday, $about, $publicPicture, $secretPicture);
+    if (!$props['u_id']) {
+        $resultArr = addNewUser($props);
     } else {
-        $resultArr = updateExistingUser($email, $password, $nickname, $birthday, $about, $publicPicture, $secretPicture, $id);
+        $resultArr = updateExistingUser($props);
     }
 
     if (isset($resultArr['u_id'])) {

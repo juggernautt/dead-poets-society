@@ -259,17 +259,16 @@ function selectEmailAndPasswordLogInProcess($u_email, $u_password)
 
 
 
-function addNewUser($u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself, $u_picture, $u_secret_pic)
+function addNewUser($props)
 {
-    $u = new User($u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself, $u_picture, $u_secret_pic);
+    $u = new User($props);
     return $u->createAndGet();
 }
 
 
-function updateExistingUser($u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself, $u_picture, $u_secret_pic, $u_id)
+function updateExistingUser($props)
 {
-    $u2 = new User($u_email, $u_password, $u_nickname, $u_birthdate, $u_about_myself, $u_picture, $u_secret_pic);
-    $u2->setUId($u_id);
+    $u2 = new User($props);
     return $u2->updateAndGet();
 }
 
