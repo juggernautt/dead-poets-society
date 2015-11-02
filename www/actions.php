@@ -9,8 +9,10 @@ $action = $_REQUEST['action'];
 
 if ($action == "post")
 {
-    $text = isset($_POST['p_text']) ? $_POST['p_text'] : "";
-    $post = createNewPost($_SESSION['loggedInUser']['u_id'], $text);
+    $props = array();
+    $props['p_text'] = isset($_POST['p_text']) ? $_POST['p_text'] : "";
+    $props['u_id'] = $_SESSION['loggedInUser']['u_id'];
+    $post = createNewPost($props);
     print json_encode($post);
     return;
 }

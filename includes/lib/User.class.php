@@ -21,7 +21,7 @@ class User
         $this->props = $this->pickElements($props, $this->fields);
     }
 
-    public function getProps($props) {
+    public function getProps() {
         return $this->props;
     }
 

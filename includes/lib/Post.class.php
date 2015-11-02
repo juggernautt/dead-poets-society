@@ -4,93 +4,38 @@ require_once('lib/DAL.php');
 
 class Post
 {
-    private $p_id;
-    private $u_id;
-    private $p_text;
-    private $p_date;
+    private $props = array();
+    private $fields = array('p_id', 'u_id', 'p_text', 'p_date');
 
-    public function __construct($u_id, $p_text)
-    {
-        $this->setUId($u_id);
-        $this->setPText($p_text);
-    }
 
-    /**
-     * @return mixed
-     */
-    public function getPText()
+    private function pickElements($array, $keys)
     {
-        return $this->p_text;
-    }
-
-    /**
-     * @param mixed $p_text
-     * @return bool
-     */
-    public function setPText($p_text)
-    {
-        if ($p_text == "") {
-            return false;
+        $result = array();
+        foreach ($keys as $key) {
+            $result[$key] = isset($array[$key]) ? $array[$key] : "";
         }
-        $this->p_text = $p_text;
-        return true;
+        return $result;
     }
 
-    /**
-     * @return mixed
-     */
-    public function getUId()
+    public function setProps($props) {
+        $this->props = $this->pickElements($props, $this->fields);
+    }
+
+    public function getProps() {
+        return $this->props;
+    }
+
+    public function __construct($props)
     {
-        return $this->u_id;
+        $this->setProps($props);
+
     }
 
-    /**
-     * @param mixed $u_id
-     */
-    public function setUId($u_id)
-    {
-        $this->u_id = $u_id;
-    }
 
-    /**
-     * @return mixed
-     */
-    public function getPId()
-    {
-        return $this->p_id;
-    }
-
-    /**
-     * @param mixed $p_id
-     */
-    public function setPId($p_id)
-    {
-        $this->p_id = $p_id;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function getPDate()
-    {
-        return $this->p_date;
-    }
-
-    /**
-     * @param mixed $p_date
-     */
-    public function setPDate($p_date)
-    {
-        $this->p_date = $p_date;
-    }
-
-    /**
-     * @return array | false - ID of inserted new post
-     */
     public function createAndGet()
     {
         $sql = "INSERT INTO `posts` (u_id, p_text) VALUES (?, ?)";
-        $insertedId = insert($sql, [$this->u_id, $this->p_text]);
+        $insertedId = insert($sql, [$this->props['u_id'], $this->props['p_text']]);
         if (!$insertedId) {
             return false;
         }

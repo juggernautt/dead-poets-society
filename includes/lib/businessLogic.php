@@ -18,14 +18,10 @@ function selectUser($u_id)
     return $user;
 }
 
-/**
- * @param int $u_id
- * @param string $p_text
- * @return array|false
- */
-function createNewPost($u_id, $p_text)
+
+function createNewPost($props)
 {
-    $p = new Post($u_id, $p_text);
+    $p = new Post($props);
     return $p->createAndGet();
 }
 

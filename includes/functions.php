@@ -16,6 +16,8 @@ function redirect($location)
 }
 
 
+
+
 function is_logged_in()
 {
     if (!isset($_SESSION['loggedInUser'])) {
@@ -75,3 +77,4 @@ function getRandomQuote()
     return $quotes[$result];
 
 }
+
