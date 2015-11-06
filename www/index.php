@@ -26,7 +26,7 @@ if (isset($_GET['u_id'])) {
             <div id="profile">
                 <!--public data-->
                 <div class="public">
-                    <img src="<?= getUserPic($user['u_picture']); ?>" width="170" height="235" alt="public-picture">
+                    <img src="/userpic.php?u_id=<?=$user['u_id']?>&type=public" width="170" height="235" alt="public-picture">
 
                     <div>
                         <p><span class="bold">Nickname:</span> <?= $user['u_nickname']; ?></p>
@@ -44,7 +44,7 @@ if (isset($_GET['u_id'])) {
                         //calculate days till user birthday
                         $days = calculateDaysTillTheDate($user['u_birthdate']); ?>
 
-                        <img src="<?= getUserPic($user['u_secret_pic']); ?>" width="170" height="235"
+                        <img src="/userpic.php?u_id=<?=$user['u_id']?>&type=private" width="170" height="235"
                              alt="secret-picture">
                         <div>
                             <p><span class="bold">About: </span> <?= $user['u_about_myself']; ?></p>
