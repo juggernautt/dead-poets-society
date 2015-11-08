@@ -1,21 +1,12 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT'].'/../includes/init.php');
 require_once('lib/DAL.php');
+require_once('lib/TableRecord.class.php');
 
-class Post
+class Post extends TableRecord
 {
     private $props = array();
     private $fields = array('p_id', 'u_id', 'p_text', 'p_date');
-
-
-    private function pickElements($array, $keys)
-    {
-        $result = array();
-        foreach ($keys as $key) {
-            $result[$key] = isset($array[$key]) ? $array[$key] : "";
-        }
-        return $result;
-    }
 
     public function setProps($props) {
         $this->props = $this->pickElements($props, $this->fields);
@@ -31,18 +22,29 @@ class Post
 
     }
 
+    public function getErrors() {
+        if($this->props['p_text'] == "") {
+            return false;
+        }
+        return true;
+    }
 
     public function createAndGet()
     {
-        $sql = "INSERT INTO `posts` (u_id, p_text) VALUES (?, ?)";
-        $insertedId = insert($sql, [$this->props['u_id'], $this->props['p_text']]);
-        if (!$insertedId) {
-            return false;
+        $errors = $this->getErrors();
+        if($errors) {
+            $sql = "INSERT INTO `posts` (u_id, p_text) VALUES (?, ?)";
+            $insertedId = insert($sql, [$this->props['u_id'], $this->props['p_text']]);
+            if (!$insertedId) {
+                return false;
+            }
+
+            $sql = "SELECT * FROM `posts` WHERE p_id= ?";
+            $post = get_record($sql, [$insertedId]);
+
+            return $post;
         }
+        return $errors;
 
-        $sql = "SELECT * FROM `posts` WHERE p_id= ?";
-        $post = get_record($sql, [$insertedId]);
-
-        return $post;
     }
 }

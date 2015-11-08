@@ -1,21 +1,12 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT'].'/../includes/init.php');
 require_once('lib/DAL.php');
+require_once('lib/TableRecord.class.php');
 
-class User
+class User extends TableRecord
 {
     private $props = array();
     private $fields = array('u_id', 'u_email', 'u_password', 'u_nickname', 'u_birthdate', 'u_about_myself', 'u_picture', 'u_secret_pic');
-
-
-    private function pickElements($array, $keys)
-    {
-        $result = array();
-        foreach ($keys as $key) {
-            $result[$key] = isset($array[$key]) ? $array[$key] : "";
-        }
-        return $result;
-    }
 
     public function setProps($props) {
         $this->props = $this->pickElements($props, $this->fields);
