@@ -29,14 +29,14 @@ function is_logged_in()
 
 function move_files($file)
 {
-    $destination = "";
+    $name = "";
     if ($file['type'] == 'image/jpeg') {
         $tmp_name = $file["tmp_name"];
-        $name = $file["name"];
-        $destination = '/../user_uploads/' . uniqid() . $name;
-        move_uploaded_file($tmp_name, $destination);
+        $name = uniqid() . $file["name"];
+        $destination = '../user_uploads/';
+        move_uploaded_file($tmp_name, $destination . $name);
     }
-    return $destination;
+    return $name;
 }
 
 
