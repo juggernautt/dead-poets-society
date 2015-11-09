@@ -33,7 +33,7 @@ function move_files($file)
     if ($file['type'] == 'image/jpeg') {
         $tmp_name = $file["tmp_name"];
         $name = $file["name"];
-        $destination = 'images/user_uploads/' . uniqid() . $name;
+        $destination = '/../user_uploads/' . uniqid() . $name;
         move_uploaded_file($tmp_name, $destination);
     }
     return $destination;

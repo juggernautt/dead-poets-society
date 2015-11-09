@@ -37,7 +37,7 @@ if ($_GET['show'] == 'all') {
 
                         <div class="user">
                             <a href="/index.php?u_id=<?= $user['u_id']; ?>">
-                                <img src="<?= getUserPic($user['u_picture']); ?>" width="150" height="167">
+                                <img src="/userpic.php?u_id=<?=$user['u_id']?>&type=public" width="150" height="167">
                             </a>
 
                             <p class="nickname"><?= $user['u_nickname']; ?></p>

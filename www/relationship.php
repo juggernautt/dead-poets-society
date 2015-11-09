@@ -24,7 +24,7 @@ is_logged_in();
                     foreach ($requests as $request) { ?>
                         <div class="relationship" u_id="<?= $request['u_id']; ?>">
                             <a href="/index.php?u_id=<?= $request['u_id']; ?>">
-                                <img src="<?= getUserPic($request['u_picture']); ?>" width="150" height="170">
+                                <img src="/userpic.php?u_id=<?=$request['u_id']?>&type=public" width="150" height="170">
                             </a>
 
                             <p><?= $request['u_nickname']; ?></p>
@@ -51,7 +51,7 @@ is_logged_in();
                     foreach ($friends as $friend) { ?>
                         <div class="relationship" u_id="<?= $friend['u_id'] ?>">
                             <a href="/index.php?u_id=<?= $friend['u_id']; ?>">
-                                <img src="<?= getUserPic($friend['u_picture']); ?>" width="150" height="170">
+                                <img src="/userpic.php?u_id=<?=$friend['u_id']?>&type=public" width="150" height="170">
                             </a>
 
                             <p><?= $friend['u_nickname']; ?></p>
@@ -77,7 +77,7 @@ is_logged_in();
                     foreach ($declines as $decline) { ?>
                         <div class="relationship" u_id="<?= $decline['u_id'] ?>">
                             <a href="/index.php?u_id=<?= $decline['u_id']; ?>">
-                                <img src="<?= getUserPic($decline['u_picture']); ?>" width="150" height="170">
+                                <img src="/userpic.php?u_id=<?=$decline['u_id']?>&type=public" width="150" height="170">
                             </a>
 
                             <p><?= $decline['u_nickname']; ?></p>

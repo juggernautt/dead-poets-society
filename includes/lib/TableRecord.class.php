@@ -18,11 +18,14 @@ class TableRecord
      */
     public function insertAndGet()
     {
-
+        // INSERT INTO $this->table (u_id, p_text, p_date) VALUES (?, ?, ?)
     }
 
     /**
      * Update properties from $this->props into database and return newly created record or array with errors
      */
-    public function updateAndGet() {}
+    public function updateAndGet()
+    {
+        // UPDATE `posts` SET u_id=?, p_text=?, p_date=? WHERE p_id=3
+    }
 }

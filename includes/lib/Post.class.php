@@ -8,6 +8,10 @@ class Post extends TableRecord
     private $props = array();
     private $fields = array('p_id', 'u_id', 'p_text', 'p_date');
 
+    private $table = 'posts';
+    private $primary_key = 'p_id';
+    private $primary_key_value = null;
+
     public function setProps($props) {
         $this->props = $this->pickElements($props, $this->fields);
     }
@@ -18,6 +22,7 @@ class Post extends TableRecord
 
     public function __construct($props)
     {
+        $this->primary_key_value = $props[$this->primary_key];
         $this->setProps($props);
 
     }
