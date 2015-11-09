@@ -22,7 +22,9 @@ function is_logged_in()
 {
     if (!isset($_SESSION['loggedInUser'])) {
         redirect('/login.php');
+        return false;
     }
+    return true;
 }
 
 
