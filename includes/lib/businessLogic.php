@@ -3,6 +3,7 @@ require_once($_SERVER['DOCUMENT_ROOT'].'/../includes/init.php');
 require_once('lib/Post.class.php');
 require_once('lib/User.class.php');
 require_once('lib/DAL.php');
+require_once('lib/AL.php');
 
 /**
  * @param int $u_id
@@ -10,12 +11,9 @@ require_once('lib/DAL.php');
  */
 function selectUser($u_id)
 {
-    $sql = "SELECT * FROM `users` WHERE u_id=? ";
-    $user = get_record($sql, [$u_id]);
-    if ($user === false) {
-        return false;
-    }
-    return $user;
+    global $config;
+    $al = new AL($config['database']);
+    return $al->select_one('users', $u_id);
 }
 
 
@@ -31,12 +29,9 @@ function createNewPost($props)
  */
 function deactivateProfile($u_id)
 {
-    $sql = "UPDATE `users` SET u_is_frozen_account = 1 WHERE u_id = ?";
-    $updatedRow = update($sql, [$u_id]);
-    if ($updatedRow === false) {
-        return false;
-    }
-    return $updatedRow;
+    global $config;
+    $al = new AL($config['database']);
+    return $al->update_one('users', $u_id, array('u_is_frozen_account' => 1));
 }
 
 /**
@@ -75,13 +70,15 @@ function isDeactivated($u_id)
  */
 function addFriend($my_id, $other_id)
 {
-    $sql = "INSERT INTO `relationship` (u_id1, u_id2, r_status, r_updated_at) VALUES (?, ? ,'REQUEST_SENT', NOW())";
-    $changeRelationship = insert($sql, [$my_id, $other_id]);
-    if (!$changeRelationship) {
-        return false;
-    }
-    $recentlyAddedUser = selectUser($other_id);
-    return $recentlyAddedUser;
+    global $config;
+    $al = new AL($config['database']);
+    $props = array(
+        'u_id1' => $my_id,
+        'u_id2' => $other_id,
+        'r_status' => 'REQUEST_SENT',
+        'r_updated_at' => time()
+    );
+    return $al->insert_one('relationship', $props);
 }
 
 /**
