@@ -42,11 +42,6 @@ function move_files($file)
 }
 
 
-function getUserPic($pictureSrc) {
-    $src = ($pictureSrc != "") ? $pictureSrc : "images/anonymous.jpg";
-    return $src;
-}
-
 function calculateDaysTillTheDate($date)
 {
     $dateArray = explode("-", $date);
