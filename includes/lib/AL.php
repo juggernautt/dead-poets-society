@@ -2,12 +2,6 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/../includes/init.php');
 
 /**
- * Created by PhpStorm.
- * User: juggernautt
- * Date: 11/14/15
- * Time: 4:14 PM
- *
- *
  * PDO::__construct
  * PDO::prepare
  * PDO::lastInsertedId
@@ -24,6 +18,7 @@ class AL
     private $db = null;
 
     /**
+     * creates a PDO instance representing a connection to a database
      * @param $connection - associative array with connection params (host, user, pass, db_name, charset)
      */
     public function __construct($connection)
@@ -66,7 +61,19 @@ class AL
      */
     public function update_one($table, $id, $props)
     {
+        $updates = array();
+        foreach ($props as $k=>$v) {
+            $updates[] = "$k = ?";
+        }
+        $pk = $this->pk_field($table);
+        $sql = "UPDATE $table SET ".implode(',', $updates)." WHERE $pk=?";
+        $stmt = $this->db->prepare($sql);
 
+        $values = array_values($props);
+        array_push($values, $id);
+        $res = $stmt->execute($values);
+
+        return $res ? $this->select_one($table, $id) : false;
     }
 
     public function delete_one($table, $id)
@@ -85,9 +92,9 @@ class AL
      */
     public function insert_one($table, $props)
     {
-        $fields = implode(", ", array_keys($props));
-        $questions = implode(", ", array_fill(0, count($props), "?"));
-        $sql = "INSERT INTO {$table} ({$fields}) VALUES ($questions)";
+        $fields = implode(", ", array_keys($props)); // "key1,key2,..."
+        $questions = implode(", ", array_fill(0, count($props), "?")); // "?,?,?..."
+        $sql = "INSERT INTO $table ($fields) VALUES ($questions)";
         $stmt = $this->db->prepare($sql);
         $res = $stmt->execute(array_values($props));
         if (!$res) {

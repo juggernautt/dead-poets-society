@@ -19,8 +19,11 @@ function selectUser($u_id)
 
 function createNewPost($props)
 {
-    $p = new Post($props);
-    return $p->createAndGet();
+//    $p = new Post($props);
+//    return $p->createAndGet();
+    global $config;
+    $al = new AL($config['database']);
+    return $al->insert_one('posts', $props);
 }
 
 /**
@@ -40,12 +43,15 @@ function deactivateProfile($u_id)
  */
 function activateProfile($u_id)
 {
-    $sql = "UPDATE `users` SET u_is_frozen_account = 0 WHERE u_id = ?";
-    $updatedRow = update($sql, [$u_id]);
-    if ($updatedRow === false) {
-        return false;
-    }
-    return $updatedRow;
+    global $config;
+    $al = new Al($config['database']);
+    return $al->update_one('users', $u_id, array('u_is_frozen_account' => 0));
+//    $sql = "UPDATE `users` SET u_is_frozen_account = 0 WHERE u_id = ?";
+//    $updatedRow = update($sql, [$u_id]);
+//    if ($updatedRow === false) {
+//        return false;
+//    }
+//    return $updatedRow;
 }
 
 /**
@@ -254,8 +260,11 @@ function selectEmailAndPasswordLogInProcess($u_email, $u_password)
 
 function addNewUser($props)
 {
-    $u = new User($props);
-    return $u->createAndGet();
+//    $u = new User($props);
+//    return $u->createAndGet();
+    global $config;
+    $al = new AL($config['database']);
+    return $al->insert_one('users', $props);
 }
 
 
