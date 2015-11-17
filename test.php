@@ -8,32 +8,30 @@
 $_SERVER['DOCUMENT_ROOT'] = "./www/";
 //
 require_once('includes/init.php');
-//require_once('lib/AL.php');
-//require_once('lib/businessLogic.php');
+require_once('lib/AL.php');
+
+$al = new AL($config['database']);
+//$result = $al->select_many('users', array('u_is_frozen_account' => 0, 'u_password' => md5('1234')));
+
+//$props = array(
+//    'u_id1' => 3,
+//    'u_id2' => 6,
+//    'r_status' => 'FRIENDS'
+//);
 //
-//print_r(selectUser(3));
-//print_r(deactivateProfile(3));
-//print_r(addFriend(3, 2));
+//$preds = array(
+//    'u_id1' => 6,
+//    'u_id2' => 3,
+//    'r_status' => 'REQUEST_SENT'
+//);
 
-//
-
-//$al = new AL($config['database']);
-//var_dump($al->select_one('posts', 106));
-//
-
-print_r(array_fill(0, 5, "?"));
+//$result = $al->update_many('relationship', $preds, $props);
 
 
-/// INSERT INTO users (u_name, u_two, ...) VALUES (?, ?, ?, ?)
+//$predicates = array(
+//    'u_id' => 1,
+//    'p_id' => 1
+//);
 
-
-
-//$sqlStatement = "UPDATE users SET u_password=MD5('123456'), u_nickname='Boffin2' WHERE u_id=13";
-//$PDOStatement = $db->prepare($sqlStatement);
-//$queryResult = $PDOStatement->execute();
-//
-//if ($queryResult) {
-//    $user = $PDOStatement->fetchAll(PDO::FETCH_ASSOC);
-//}
-//
-//print_r($user);
+//$result = $al->delete_many('posts', $predicates);
+//var_dump($result);

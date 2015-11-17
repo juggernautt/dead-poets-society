@@ -19,8 +19,6 @@ function selectUser($u_id)
 
 function createNewPost($props)
 {
-//    $p = new Post($props);
-//    return $p->createAndGet();
     global $config;
     $al = new AL($config['database']);
     return $al->insert_one('posts', $props);
@@ -46,12 +44,6 @@ function activateProfile($u_id)
     global $config;
     $al = new Al($config['database']);
     return $al->update_one('users', $u_id, array('u_is_frozen_account' => 0));
-//    $sql = "UPDATE `users` SET u_is_frozen_account = 0 WHERE u_id = ?";
-//    $updatedRow = update($sql, [$u_id]);
-//    if ($updatedRow === false) {
-//        return false;
-//    }
-//    return $updatedRow;
 }
 
 /**
@@ -60,12 +52,10 @@ function activateProfile($u_id)
  */
 function isDeactivated($u_id)
 {
-    $sql = "SELECT u_is_frozen_account FROM `users` WHERE `u_id`=?";
-    $isFrozen = get_record($sql, [$u_id]);
-    if ($isFrozen === false) {
-        return false;
-    }
-    return $isFrozen['u_is_frozen_account'];
+    global $config;
+    $al = new Al($config['database']);
+    $user = $al->select_one('users', $u_id);
+    return $user ? $user['u_is_frozen_account'] : false;
 }
 
 
@@ -90,17 +80,32 @@ function addFriend($my_id, $other_id)
 /**
  * @param $my_id
  * @param $other_id
- * @return array|bool|false
+ * @return array|false
  */
 function acceptFriendship($my_id, $other_id)
 {
-    $sql = "UPDATE `relationship` SET u_id1 = ?, u_id2 = ? , r_status = 'FRIENDS' WHERE u_id2 = ? AND u_id1 = ? AND r_status='REQUEST_SENT' ";
-    $changeRelationship = update($sql, [$my_id, $other_id, $my_id, $other_id]);
-    if ($changeRelationship === false) {
-        return false;
-    }
-    $acceptedUser = selectUser($other_id);
-    return $acceptedUser;
+    global $config;
+    $al = new AL($config['database']);
+    $props = array(
+        'u_id1' => $my_id,
+        'u_id2' => $other_id,
+        'r_status' => 'FRIENDS'
+    );
+    $preds = array(
+        'u_id1' => $other_id,
+        'u_id2' => $my_id,
+        'r_status' => 'REQUEST_SENT'
+    );
+    return $al->update_many('relationships', $preds, $props);
+//
+//
+//    $sql = "UPDATE `relationship` SET u_id1 = ?, u_id2 = ? , r_status = 'FRIENDS' WHERE u_id2 = ? AND u_id1 = ? AND r_status='REQUEST_SENT' ";
+//    $changeRelationship = update($sql, [$my_id, $other_id, $my_id, $other_id]);
+//    if ($changeRelationship === false) {
+//        return false;
+//    }
+//    $acceptedUser = selectUser($other_id);
+//    return $acceptedUser;
 }
 
 /**
@@ -110,13 +115,29 @@ function acceptFriendship($my_id, $other_id)
  */
 function declineFriendship($my_id, $other_id)
 {
-    $sql = "UPDATE `relationship` SET r_updated_at = NOW(), u_id1 = ?, u_id2 = ?, r_status = 'DECLINED' WHERE u_id2 = ? AND u_id1 = ? AND r_status='REQUEST_SENT' ";
-    $changeRelationship = update($sql, [$my_id, $other_id, $my_id, $other_id]);
-    if ($changeRelationship === false) {
-        return false;
-    }
-    $declinedUser = selectUser($other_id);
-    return $declinedUser;
+    global $config;
+    $al = new AL($config['database']);
+    $props = array(
+        'u_id1' => $my_id,
+        'u_id2' => $other_id,
+        'r_status' => 'DECLINED',
+        'r_updated_at' => time()
+    );
+    $preds = array(
+        'u_id1' => $other_id,
+        'u_id2' => $my_id,
+        'r_status' => 'REQUEST_SENT'
+    );
+    return $al->update_many('relationship', $preds, $props);
+
+//
+//    $sql = "UPDATE `relationship` SET r_updated_at = NOW(), u_id1 = ?, u_id2 = ?, r_status = 'DECLINED' WHERE u_id2 = ? AND u_id1 = ? AND r_status='REQUEST_SENT' ";
+//    $changeRelationship = update($sql, [$my_id, $other_id, $my_id, $other_id]);
+//    if ($changeRelationship === false) {
+//        return false;
+//    }
+//    $declinedUser = selectUser($other_id);
+//    return $declinedUser;
 }
 
 /**
@@ -126,13 +147,28 @@ function declineFriendship($my_id, $other_id)
  */
 function unFriend($my_id, $other_id)
 {
-    $sql = "DELETE FROM `relationship` WHERE r_status='FRIENDS' AND ((u_id1 = ? AND u_id2 = ?) OR (u_id2 = ? AND u_id1 = ?)) ";
-    $changeRelationship = delete($sql, [$my_id, $other_id, $my_id, $other_id]);
-    if ($changeRelationship === false) {
-        return false;
-    }
-    $unFriendUser = selectUser($other_id);
-    return $unFriendUser;
+    global $config;
+    $al = new AL($config['database']);
+    $preds1 = array(
+        'u_id1' => $my_id,
+        'u_id2' => $other_id,
+        'r_status' => 'FRIENDS'
+    );
+    $preds2 = array(
+        'u_id1' => $other_id,
+        'u_id2' => $my_id,
+        'r_status' => 'FRIENDS'
+    );
+    $res = $al->delete_many('relatioship', $preds1);
+    return $res ? $res : $al->delete_many('relationship', $preds2);
+//
+//    $sql = "DELETE FROM `relationship` WHERE r_status='FRIENDS' AND ((u_id1 = ? AND u_id2 = ?) OR (u_id2 = ? AND u_id1 = ?)) ";
+//    $changeRelationship = delete($sql, [$my_id, $other_id, $my_id, $other_id]);
+//    if ($changeRelationship === false) {
+//        return false;
+//    }
+//    $unFriendUser = selectUser($other_id);
+//    return $unFriendUser;
 }
 
 /**
@@ -142,13 +178,27 @@ function unFriend($my_id, $other_id)
  */
 function regretAndBecomeFriends($my_id, $other_id)
 {
-    $sql = "UPDATE `relationship` SET  r_status = 'FRIENDS' WHERE u_id1 = ? AND u_id2 = ? AND r_status='DECLINED' ";
-    $changeRelationship = update($sql, [$my_id, $other_id]);
-    if ($changeRelationship === false) {
-        return false;
-    }
-    $regret = selectUser($other_id);
-    return $regret;
+    global $config;
+    $al = new AL($config['database']);
+
+    $props = array(
+        'u_id1' => $my_id,
+        'u_id2' => $other_id,
+        'r_status' => 'FRIENDS'
+    );
+    $preds = array(
+        'u_id1' => $my_id,
+        'u_id2' => $other_id,
+        'r_status' => 'DECLINED'
+    );
+    return $al->update_many('relationship', $preds, $props);
+//    $sql = "UPDATE `relationship` SET  r_status = 'FRIENDS' WHERE u_id1 = ? AND u_id2 = ? AND r_status='DECLINED' ";
+//    $changeRelationship = update($sql, [$my_id, $other_id]);
+//    if ($changeRelationship === false) {
+//        return false;
+//    }
+//    $regret = selectUser($other_id);
+//    return $regret;
 }
 
 
@@ -158,7 +208,7 @@ function regretAndBecomeFriends($my_id, $other_id)
  */
 function selectUserPosts($u_id)
 {
-    $sql = "SELECT * FROM `posts` WHERE u_id= ? ORDER BY p_date DESC";
+    $sql = "SELECT * FROM `posts` WHERE u_id= ? ORDER BY p_date DESC"; // $al->select_many('posts', [u_id=>$_id])
     $posts = get_records($sql, [$u_id]);
     if ($posts === false) {
         return false;
@@ -169,12 +219,26 @@ function selectUserPosts($u_id)
 
 function isRelationship($my_id, $other_id)
 {
-    $sql = "SELECT * FROM `relationship` WHERE (u_id1 = ? AND u_id2 = ?) OR (u_id1 = ? AND u_id2 = ?)";
-    $relationship = get_record($sql, [$my_id, $other_id, $other_id, $my_id]);
-    if ($relationship === false) {
-        return false;
-    }
-    return $relationship;
+    global $config;
+    $al = new AL($config['database']);
+    $preds1 = array(
+        'u_id1' => $my_id,
+        'u_id2' => $other_id
+
+    );
+    $preds2 = array(
+        'u_id1' => $other_id,
+        'u_id2' => $my_id
+    );
+    $res = $al->select_many('relationship', $preds1);
+    return $res ? $res : $al->select_many('relationship', $preds2);
+
+//    $sql = "SELECT * FROM `relationship` WHERE (u_id1 = ? AND u_id2 = ?) OR (u_id1 = ? AND u_id2 = ?)";
+//    $relationship = get_record($sql, [$my_id, $other_id, $other_id, $my_id]);
+//    if ($relationship === false) {
+//        return false;
+//    }
+//    return $relationship;
 }
 
 /**
@@ -245,12 +309,19 @@ function selectDeclines($my_id)
  */
 function selectEmailAndPasswordLogInProcess($u_email, $u_password)
 {
-    $sql = "SELECT * FROM `users` WHERE u_email=? AND u_password=? ";
-    $loggedInUser = get_record($sql, [$u_email, md5($u_password)]);
-    if ($loggedInUser === false) {
-        return false;
-    }
-    return $loggedInUser;
+    global $config;
+    $al = new AL($config['database']);
+    $preds = array(
+        'u_email' => $u_email,
+        'u_password' => md5($u_password)
+    );
+    return $al->select_many('users', $preds);
+//    $sql = "SELECT * FROM `users` WHERE u_email=? AND u_password=? ";
+//    $loggedInUser = get_record($sql, [$u_email, md5($u_password)]);
+//    if ($loggedInUser === false) {
+//        return false;
+//    }
+//    return $loggedInUser;
 }
 
 
@@ -282,39 +353,37 @@ function updateExistingUser($props)
 function getRelationshipStatus($my_id, $other_id)
 {
 
-    $sql = "SELECT * FROM `relationship` WHERE (u_id1 = ? AND u_id2 = ?) OR (u_id1 = ? AND u_id2 = ?)";
-    $relationship = get_record($sql, [$my_id, $other_id, $other_id, $my_id]);
-    if (!$relationship) {
+    global $config;
+    $al = new AL($config['database']);
+
+    $res = isRelationship($my_id, $other_id);
+    if (!$res) {
         return NO_RELATIONSHIP;
     }
 
-    $sql = "SELECT * FROM `relationship` WHERE r_status='FRIENDS' AND ((u_id1 = ? AND u_id2 = ?) OR (u_id1 = ? AND u_id2 = ?))";
-    $friends = get_record($sql, [$my_id, $other_id, $other_id, $my_id]);
-    if ($friends) {
+    if ($al->select_many('relationship', ['r_status' => 'FRIENDS', 'u_id1' => $my_id, 'u_id2' => $other_id]) ||
+        $al->select_many('relationship', ['r_status' => 'FRIENDS', 'u_id1' => $other_id, 'u_id2' => $my_id]))
+    {
         return FRIENDS;
     }
 
-    $sql = "SELECT * FROM `relationship` WHERE r_status='REQUEST_SENT' AND (u_id1 = ? AND u_id2 = ?)";
-    $mineRequest = get_record($sql, [$my_id, $other_id]);
-    if ($mineRequest) {
+    $res = $al->select_many('relationship', ['r_status' => 'REQUEST_SENT', 'u_id1' => $my_id, 'u_id2' => $other_id]);
+    if($res) {
         return MINE_REQUEST;
     }
 
-    $sql = "SELECT * FROM `relationship` WHERE r_status='REQUEST_SENT' AND (u_id1 = ? AND u_id2 = ?)";
-    $hisRequest = get_record($sql, [$other_id, $my_id]);
-    if ($hisRequest) {
+    $res = $al->select_many('relationship', ['r_status' => 'REQUEST_SENT', 'u_id1' => $other_id, 'u_id2' => $my_id]);
+    if($res) {
         return HIS_REQUEST;
     }
 
-    $sql = "SELECT * FROM `relationship` WHERE r_status='DECLINED' AND (u_id1 = ? AND u_id2 = ?)";
-    $mineDecline = get_record($sql, [$my_id, $other_id]);
-    if ($mineDecline) {
+    $res = $al->select_many('relationship', ['r_status' => 'DECLINED', 'u_id1' => $my_id, 'u_id2' => $other_id]);
+    if($res) {
         return MINE_DECLINE;
     }
 
-    $sql = "SELECT * FROM `relationship` WHERE r_status='DECLINED' AND (u_id1 = ? AND u_id2 = ?)";
-    $hisDecline = get_record($sql, [$other_id, $my_id]);
-    if ($hisDecline) {
+    $res = $al->select_many('relationship', ['r_status' => 'DECLINED', 'u_id1' => $other_id, 'u_id2' => $my_id]);
+    if($res) {
         return HIS_DECLINE;
     }
 

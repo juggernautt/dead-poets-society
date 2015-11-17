@@ -1,15 +1,7 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT'].'/../includes/init.php');
 
-/**
- * PDO::__construct
- * PDO::prepare
- * PDO::lastInsertedId
- *
- * PDOStatement::execute
- * PDOStatement::fetchAll
- * PDOStatement::fetch
- */
+
 class AL
 {
     /**
@@ -41,6 +33,25 @@ class AL
         return $res ? $stmt->fetch(PDO::FETCH_ASSOC) : false;
     }
 
+    public function array_with_keys($arr) {
+        $res = array();
+        foreach($arr as $k=>$v) {
+            $res[] = "$k=?";
+        }
+        return $res;
+    }
+
+    public function select_many($table, $predicates)
+    {
+        $preds = $this->array_with_keys($predicates);
+        $sql = "SELECT * FROM {$table} WHERE " . implode(' AND ', $preds);
+        $stmt = $this->db->prepare($sql);
+        $values = array_values($predicates);
+        $res = $stmt->execute($values);
+        return $res ? $stmt->fetch(PDO::FETCH_ASSOC) : false;
+
+    }
+
     /**
      * @param string $table
      * @return array | false
@@ -61,10 +72,7 @@ class AL
      */
     public function update_one($table, $id, $props)
     {
-        $updates = array();
-        foreach ($props as $k=>$v) {
-            $updates[] = "$k = ?";
-        }
+        $updates = $this->array_with_keys($props);
         $pk = $this->pk_field($table);
         $sql = "UPDATE $table SET ".implode(',', $updates)." WHERE $pk=?";
         $stmt = $this->db->prepare($sql);
@@ -76,6 +84,26 @@ class AL
         return $res ? $this->select_one($table, $id) : false;
     }
 
+    /**
+     * @param string $table
+     * @param array $predicates
+     * @param array $props
+     * @return boolean
+     */
+    public function update_many($table, $predicates, $props)
+    {
+        $updates = $this->array_with_keys($props);
+        $preds = $this->array_with_keys($predicates);
+
+        $sql = "UPDATE {$table} SET " . implode(',', $updates) . " WHERE " . implode(' AND ', $preds);
+        $stmt = $this->db->prepare($sql);
+
+        $mergedValues = array_merge(array_values($props), array_values($predicates));
+        $res = $stmt->execute($mergedValues);
+        return $res;
+
+    }
+
     public function delete_one($table, $id)
     {
         $pk = $this->pk_field($table);
@@ -83,6 +111,34 @@ class AL
         $stmt = $this->db->prepare($sql);
         $res = $stmt->execute(array($id));
         return $res;
+    }
+
+    /**
+     * @param string $table
+     * @param array $predicates
+     * @return boolean
+     */
+    public function delete_many($table, $predicates)
+    {
+        $preds = $this->array_with_keys($predicates);
+
+        $sql = "DELETE FROM {$table} WHERE " . implode(' AND ', $preds);
+        $stmt = $this->db->prepare($sql);
+        $values = array_values($predicates);
+        $res = $stmt->execute($values);
+        return $res;
+
+    }
+
+
+    /**
+     * @param string $sql
+     * @param array $values
+     * @return array | boolean
+     */
+    public function query($sql, $values)
+    {
+
     }
 
     /**
