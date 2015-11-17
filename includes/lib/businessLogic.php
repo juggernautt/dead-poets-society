@@ -72,7 +72,7 @@ function addFriend($my_id, $other_id)
         'u_id1' => $my_id,
         'u_id2' => $other_id,
         'r_status' => 'REQUEST_SENT',
-        'r_updated_at' => time()
+        'r_updated_at' => date('d/m/Y')
     );
     return $al->insert_one('relationship', $props);
 }
@@ -97,15 +97,6 @@ function acceptFriendship($my_id, $other_id)
         'r_status' => 'REQUEST_SENT'
     );
     return $al->update_many('relationships', $preds, $props);
-//
-//
-//    $sql = "UPDATE `relationship` SET u_id1 = ?, u_id2 = ? , r_status = 'FRIENDS' WHERE u_id2 = ? AND u_id1 = ? AND r_status='REQUEST_SENT' ";
-//    $changeRelationship = update($sql, [$my_id, $other_id, $my_id, $other_id]);
-//    if ($changeRelationship === false) {
-//        return false;
-//    }
-//    $acceptedUser = selectUser($other_id);
-//    return $acceptedUser;
 }
 
 /**
@@ -121,7 +112,7 @@ function declineFriendship($my_id, $other_id)
         'u_id1' => $my_id,
         'u_id2' => $other_id,
         'r_status' => 'DECLINED',
-        'r_updated_at' => time()
+        'r_updated_at' => date('d/m/Y')
     );
     $preds = array(
         'u_id1' => $other_id,
@@ -129,15 +120,6 @@ function declineFriendship($my_id, $other_id)
         'r_status' => 'REQUEST_SENT'
     );
     return $al->update_many('relationship', $preds, $props);
-
-//
-//    $sql = "UPDATE `relationship` SET r_updated_at = NOW(), u_id1 = ?, u_id2 = ?, r_status = 'DECLINED' WHERE u_id2 = ? AND u_id1 = ? AND r_status='REQUEST_SENT' ";
-//    $changeRelationship = update($sql, [$my_id, $other_id, $my_id, $other_id]);
-//    if ($changeRelationship === false) {
-//        return false;
-//    }
-//    $declinedUser = selectUser($other_id);
-//    return $declinedUser;
 }
 
 /**
@@ -159,16 +141,9 @@ function unFriend($my_id, $other_id)
         'u_id2' => $my_id,
         'r_status' => 'FRIENDS'
     );
-    $res = $al->delete_many('relatioship', $preds1);
-    return $res ? $res : $al->delete_many('relationship', $preds2);
-//
-//    $sql = "DELETE FROM `relationship` WHERE r_status='FRIENDS' AND ((u_id1 = ? AND u_id2 = ?) OR (u_id2 = ? AND u_id1 = ?)) ";
-//    $changeRelationship = delete($sql, [$my_id, $other_id, $my_id, $other_id]);
-//    if ($changeRelationship === false) {
-//        return false;
-//    }
-//    $unFriendUser = selectUser($other_id);
-//    return $unFriendUser;
+    $res1 = $al->delete_many('relatioship', $preds1);
+    $res2 = $al->delete_many('relationship', $preds2);
+    return $res1 || $res2;
 }
 
 /**
@@ -192,13 +167,6 @@ function regretAndBecomeFriends($my_id, $other_id)
         'r_status' => 'DECLINED'
     );
     return $al->update_many('relationship', $preds, $props);
-//    $sql = "UPDATE `relationship` SET  r_status = 'FRIENDS' WHERE u_id1 = ? AND u_id2 = ? AND r_status='DECLINED' ";
-//    $changeRelationship = update($sql, [$my_id, $other_id]);
-//    if ($changeRelationship === false) {
-//        return false;
-//    }
-//    $regret = selectUser($other_id);
-//    return $regret;
 }
 
 
@@ -208,9 +176,11 @@ function regretAndBecomeFriends($my_id, $other_id)
  */
 function selectUserPosts($u_id)
 {
-    $sql = "SELECT * FROM `posts` WHERE u_id= ? ORDER BY p_date DESC"; // $al->select_many('posts', [u_id=>$_id])
-    $posts = get_records($sql, [$u_id]);
-    if ($posts === false) {
+    global $config;
+    $al = new AL($config['database']);
+    $sql = "SELECT * FROM `posts` WHERE u_id= ? ORDER BY p_date DESC";
+    $posts = $al->query($sql, [$u_id]);
+    if (!$posts) {
         return false;
     }
     return $posts;
@@ -232,13 +202,6 @@ function isRelationship($my_id, $other_id)
     );
     $res = $al->select_many('relationship', $preds1);
     return $res ? $res : $al->select_many('relationship', $preds2);
-
-//    $sql = "SELECT * FROM `relationship` WHERE (u_id1 = ? AND u_id2 = ?) OR (u_id1 = ? AND u_id2 = ?)";
-//    $relationship = get_record($sql, [$my_id, $other_id, $other_id, $my_id]);
-//    if ($relationship === false) {
-//        return false;
-//    }
-//    return $relationship;
 }
 
 /**
@@ -248,9 +211,11 @@ function isRelationship($my_id, $other_id)
  */
 function selectAllActiveUsers($my_id, $order_by)
 {
+    global $config;
+    $al = new AL($config['database']);
     $sql = "SELECT * FROM `users` WHERE u_id!=? AND u_is_frozen_account != 1 ORDER BY `u_nickname` $order_by";
-    $users = get_records($sql, [$my_id]);
-    if ($users === false) {
+    $users = $al->query($sql, [$my_id]);
+    if (!$users) {
         return false;
     }
     return $users;
@@ -264,10 +229,12 @@ function selectAllActiveUsers($my_id, $order_by)
  */
 function selectActiveUserFriends($my_id, $order_by)
 {
+    global $config;
+    $al = new AL($config['database']);
     $sql = "SELECT * FROM `users` LEFT JOIN `relationship` ON (users.u_id=relationship.u_id1 OR users.u_id=relationship.u_id2)
             WHERE r_status='FRIENDS' AND u_is_frozen_account != 1 AND u_id!= ? AND (u_id1= ? OR u_id2 = ?) ORDER BY  `u_nickname` $order_by";
-    $userFriends = get_records($sql, [$my_id, $my_id, $my_id]);
-    if ($userFriends === false) {
+    $userFriends = $al->query($sql, [$my_id, $my_id, $my_id]);
+    if (!$userFriends) {
         return false;
     }
     return $userFriends;
@@ -280,9 +247,11 @@ function selectActiveUserFriends($my_id, $order_by)
  */
 function selectRequests($my_id)
 {
+    global $config;
+    $al = new AL($config['database']);
     $sql = "SELECT * FROM  `users` LEFT JOIN `relationship` ON users.u_id=relationship.u_id1 WHERE r_status='REQUEST_SENT' AND u_id2= ? AND u_is_frozen_account != 1";
-    $requests = get_records($sql, [$my_id]);
-    if ($requests === false) {
+    $requests = $al->query($sql, [$my_id]);
+    if (!$requests) {
         return false;
     }
     return $requests;
@@ -294,9 +263,11 @@ function selectRequests($my_id)
  */
 function selectDeclines($my_id)
 {
+    global $config;
+    $al = new AL($config['database']);
     $sql = "SELECT * FROM  `users` LEFT JOIN `relationship` ON users.u_id=relationship.u_id2 WHERE r_status='DECLINED' AND u_is_frozen_account != 1 AND u_id1= ? ";
-    $declines = get_records($sql, [$my_id]);
-    if ($declines === false) {
+    $declines = $al->query($sql, [$my_id]);
+    if (!$declines) {
         return false;
     }
     return $declines;
@@ -316,12 +287,6 @@ function selectEmailAndPasswordLogInProcess($u_email, $u_password)
         'u_password' => md5($u_password)
     );
     return $al->select_many('users', $preds);
-//    $sql = "SELECT * FROM `users` WHERE u_email=? AND u_password=? ";
-//    $loggedInUser = get_record($sql, [$u_email, md5($u_password)]);
-//    if ($loggedInUser === false) {
-//        return false;
-//    }
-//    return $loggedInUser;
 }
 
 
@@ -331,8 +296,6 @@ function selectEmailAndPasswordLogInProcess($u_email, $u_password)
 
 function addNewUser($props)
 {
-//    $u = new User($props);
-//    return $u->createAndGet();
     global $config;
     $al = new AL($config['database']);
     return $al->insert_one('users', $props);
@@ -341,8 +304,9 @@ function addNewUser($props)
 
 function updateExistingUser($props)
 {
-    $u2 = new User($props);
-    return $u2->updateAndGet();
+    global $config;
+    $al = new AL($config['database']);
+    return $al->update_one('users', $props['u_id'], $props);
 }
 
 /**

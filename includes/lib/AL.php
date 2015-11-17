@@ -138,7 +138,9 @@ class AL
      */
     public function query($sql, $values)
     {
-
+        $stmt = $this->db->prepare($sql);
+        $stmt->execute($values);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
