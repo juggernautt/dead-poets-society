@@ -47,7 +47,8 @@ if ($action == "Accept")
 
 if ($action == "Add Friend")
 {
-    $addedFriend = addFriend($_SESSION['loggedInUser']['u_id'], $_POST['u_id']);
+    $props = array('u_id1' => $_SESSION['loggedInUser']['u_id'], 'u_id2' => $_POST['u_id'], 'r_status' => 'REQUEST_SENT', 'r_updated_at' => date('d-m-Y', time()));
+    $addedFriend = addFriend($props);
     print json_encode($addedFriend);
     return;
 }

@@ -1,26 +1,33 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT'].'/../includes/init.php');
 require_once('lib/DAL.php');
+require_once('lib/AL.php');
 require_once('lib/TableRecord.class.php');
 
 class User extends TableRecord
 {
-    private $props = array();
+    protected $props = array();
     private $fields = array('u_id', 'u_email', 'u_password', 'u_nickname', 'u_birthdate', 'u_about_myself', 'u_picture', 'u_secret_pic');
-
     private $table = 'users';
     private $primary_key = 'u_id';
 
-    public function setProps($props) {
+
+    private $al = null;
+
+    public function setProps($props)
+    {
         $this->props = $this->pickElements($props, $this->fields);
     }
 
-    public function getProps() {
+    public function getProps()
+    {
         return $this->props;
     }
 
-    public function __construct($props)
+    public function __construct($props = array())
     {
+        global $config;
+        $this->al = new AL($config['database']);
         $this->setProps($props);
     }
 
@@ -28,51 +35,52 @@ class User extends TableRecord
     {
         $errors =$this->getErrors(true);
         if(count($errors) == 0) {
-            $sql = "INSERT INTO `users` (u_email, u_password, u_nickname, u_birthdate, u_about_myself, u_picture, u_secret_pic) VALUES (?, ?, ?, ?, ?, ?, ?)";
-            $insertedId = insert($sql, [$this->props['u_email'], $this->props['u_password'], $this->props['u_nickname'],
-                $this->props['u_birthdate'], $this->props['u_about_myself'], $this->props['u_picture'], $this->props['u_secret_pic']]);
-
-            if (!$insertedId) {
-                return false;
-            }
-
-            $newUser = $this->selectByEmailAndPassword();
-            return $newUser;
-
+            return $this->al->insert_one($this->table, $this->props);
         }
         return $errors;
     }
 
-    public function updateAndGet() {
+    public function updateAndGet()
+    {
         $errors = $this->getErrors(false);
         if(count($errors) == 0) {
-            $values = [$this->props['u_email'], $this->props['u_password'], $this->props['u_nickname'], $this->props['u_birthdate'], $this->props['u_about_myself']];
-            $sql = "UPDATE `users` SET u_email=?, u_password=?, u_nickname=?, u_birthdate=?, u_about_myself=?";
-
-            if ($this->props['u_picture']) {
-                array_push($values, $this->props['u_picture']);
-                $sql .= ", u_picture=?";
-            }
-            if ($this->props['u_secret_pic']) {
-                array_push($values, $this->props['u_secret_pic']);
-                $sql .= ", u_secret_pic=?";
-            }
-            array_push($values, $this->props['u_id']);
-            $sql .= " WHERE u_id=?";
-
-            $updatedRows = update($sql, $values);
-            if ($updatedRows === false) {
-                return false;
-            }
-            $existingUser = $this->selectUserById();
-            return $existingUser;
+            return $this->al->update_one($this->table, $this->props['u_id'], $this->props);
         }
         return $errors;
     }
 
 
 
-    public function getErrors($isToCheckMail) {
+    public function selectById($id)
+    {
+        return $this->al->select_one($this->table, $id);
+    }
+
+
+
+
+    public function deactivate($id)
+    {
+        return $this->al->update_one('users', $id, array('u_is_frozen_account' => 1));
+    }
+
+    public function activate($id)
+    {
+        return $this->al->update_one('users', $id, array('u_is_frozen_account' => 0));
+    }
+
+    public function authorize($props)
+    {
+        $preds = array(
+            'u_email' => $props['u_email'],
+            'u_password' => md5($props['u_password'])
+        );
+        return $this->al->select_many($this->table, $preds);
+    }
+
+
+    public function getErrors($isToCheckMail)
+    {
         $errors = array();
         if ($this->props['u_email'] == "" || $this->props['u_password'] == "" || $this->props['u_nickname'] == "" || $this->props['u_birthdate'] == "") {
             $errors['non_empty'] = "Email, password, username and birthday should not be empty";
@@ -82,35 +90,12 @@ class User extends TableRecord
         }
 
         if ($isToCheckMail) {
-            $sql = "SELECT * FROM `users` WHERE u_email=?";
-            $email = get_record($sql, [$this->props['u_email']]);
-            if ($email) {
+            $users = $this->al->select_many('users', ['u_email' => $this->props['u_email']]);
+            if (count($users)) {
                 $errors['u_email'] = "Your email should be unique";
             }
         }
         return $errors;
     }
-
-    function selectByEmailAndPassword()
-    {
-        $sql = "SELECT * FROM `users` WHERE u_email=? AND u_password=? ";
-        $loggedInUser = get_record($sql, [$this->props['u_email'], $this->props['u_password']]);
-        if ($loggedInUser === false) {
-            return false;
-        }
-        return $loggedInUser;
-    }
-
-    function selectUserById()
-    {
-        $sql = "SELECT * FROM `users` WHERE u_id=? ";
-        $user = get_record($sql, [$this->props['u_id']]);
-        if ($user === false) {
-            return false;
-        }
-        return $user;
-    }
-
-
 }
 

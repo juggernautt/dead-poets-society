@@ -1,16 +1,18 @@
 <?php
 require_once($_SERVER['DOCUMENT_ROOT'].'/../includes/init.php');
 require_once('lib/DAL.php');
+require_once('lib/AL.php');
 require_once('lib/TableRecord.class.php');
 
 class Post extends TableRecord
 {
-    private $props = array();
+    protected $props = array();
     private $fields = array('p_id', 'u_id', 'p_text', 'p_date');
-
     private $table = 'posts';
     private $primary_key = 'p_id';
-    private $primary_key_value = null;
+    //private $primary_key_value = null;
+
+    private $al = null;
 
     public function setProps($props) {
         $this->props = $this->pickElements($props, $this->fields);
@@ -22,7 +24,9 @@ class Post extends TableRecord
 
     public function __construct($props)
     {
-        $this->primary_key_value = $props[$this->primary_key];
+        global $config;
+        $this->al = new AL($config['database']);
+        //$this->primary_key_value = $props[$this->primary_key];
         $this->setProps($props);
 
     }
@@ -36,20 +40,11 @@ class Post extends TableRecord
 
     public function createAndGet()
     {
-        $errors = $this->getErrors();
-        if($errors) {
-            $sql = "INSERT INTO `posts` (u_id, p_text) VALUES (?, ?)";
-            $insertedId = insert($sql, [$this->props['u_id'], $this->props['p_text']]);
-            if (!$insertedId) {
-                return false;
-            }
-
-            $sql = "SELECT * FROM `posts` WHERE p_id= ?";
-            $post = get_record($sql, [$insertedId]);
-
-            return $post;
+        $isValid = $this->getErrors();
+        if($isValid) {
+           return $this->al->insert_one($this->table, $this->props);
         }
-        return $errors;
-
+        return false;
     }
+
 }

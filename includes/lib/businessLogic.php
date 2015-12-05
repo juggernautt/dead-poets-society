@@ -2,6 +2,7 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/../includes/init.php');
 require_once('lib/Post.class.php');
 require_once('lib/User.class.php');
+require_once('lib/Relationship.class.php');
 require_once('lib/DAL.php');
 require_once('lib/AL.php');
 
@@ -11,17 +12,15 @@ require_once('lib/AL.php');
  */
 function selectUser($u_id)
 {
-    global $config;
-    $al = new AL($config['database']);
-    return $al->select_one('users', $u_id);
+    $u = new User();
+    return $u->selectById($u_id);
 }
 
 
 function createNewPost($props)
 {
-    global $config;
-    $al = new AL($config['database']);
-    return $al->insert_one('posts', $props);
+    $p = new Post($props);
+    return $p->createAndGet();
 }
 
 /**
@@ -30,9 +29,8 @@ function createNewPost($props)
  */
 function deactivateProfile($u_id)
 {
-    global $config;
-    $al = new AL($config['database']);
-    return $al->update_one('users', $u_id, array('u_is_frozen_account' => 1));
+    $u = new User();
+    return $u->deactivate($u_id);
 }
 
 /**
@@ -41,9 +39,8 @@ function deactivateProfile($u_id)
  */
 function activateProfile($u_id)
 {
-    global $config;
-    $al = new Al($config['database']);
-    return $al->update_one('users', $u_id, array('u_is_frozen_account' => 0));
+    $u = new User();
+    return $u->activate($u_id);
 }
 
 /**
@@ -52,29 +49,20 @@ function activateProfile($u_id)
  */
 function isDeactivated($u_id)
 {
-    global $config;
-    $al = new Al($config['database']);
-    $user = $al->select_one('users', $u_id);
+    $u = new User();
+    $user = $u->selectById($u_id);
     return $user ? $user['u_is_frozen_account'] : false;
 }
 
 
 /**
- * @param $my_id
- * @param $other_id
+ * @param array
  * @return array|false
  */
-function addFriend($my_id, $other_id)
+function addFriend($props)
 {
-    global $config;
-    $al = new AL($config['database']);
-    $props = array(
-        'u_id1' => $my_id,
-        'u_id2' => $other_id,
-        'r_status' => 'REQUEST_SENT',
-        'r_updated_at' => date('d/m/Y')
-    );
-    return $al->insert_one('relationship', $props);
+    $r = new Relationship($props);
+    return $r->add();
 }
 
 /**
@@ -141,7 +129,7 @@ function unFriend($my_id, $other_id)
         'u_id2' => $my_id,
         'r_status' => 'FRIENDS'
     );
-    $res1 = $al->delete_many('relatioship', $preds1);
+    $res1 = $al->delete_many('relationship', $preds1);
     $res2 = $al->delete_many('relationship', $preds2);
     return $res1 || $res2;
 }
@@ -274,39 +262,26 @@ function selectDeclines($my_id)
 }
 
 /**
- * @param $u_email
- * @param  $u_password
+ * @param array
  * @return array|false
  */
-function selectEmailAndPasswordLogInProcess($u_email, $u_password)
+function selectEmailAndPasswordLogInProcess($props)
 {
-    global $config;
-    $al = new AL($config['database']);
-    $preds = array(
-        'u_email' => $u_email,
-        'u_password' => md5($u_password)
-    );
-    return $al->select_many('users', $preds);
+    $u = new User();
+    return $u->authorize($props);
 }
-
-
-
-
-
 
 function addNewUser($props)
 {
-    global $config;
-    $al = new AL($config['database']);
-    return $al->insert_one('users', $props);
+    $u = new User($props);
+    return $u->createAndGet();
 }
 
 
 function updateExistingUser($props)
 {
-    global $config;
-    $al = new AL($config['database']);
-    return $al->update_one('users', $props['u_id'], $props);
+    $u = new User($props);
+    return $u->updateAndGet();
 }
 
 /**
