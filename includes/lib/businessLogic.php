@@ -74,6 +74,7 @@ function acceptFriendship($my_id, $other_id)
 {
     global $config;
     $al = new AL($config['database']);
+
     $props = array(
         'u_id1' => $my_id,
         'u_id2' => $other_id,

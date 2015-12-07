@@ -44,7 +44,15 @@ class Relationship extends TableRecord
     }
 
 
-
+    public function acceptFriendship()
+    {
+        $newProps = [
+            'u_id1' => $this->props['u_id2'],
+            'u_id2' => $this->props['u_id1'],
+            'r_status' => 'FRIENDS'
+        ];
+        return $this->al->update_many('relationships', $this->props, $newProps);
+    }
 
 
 }
