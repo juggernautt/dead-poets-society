@@ -167,7 +167,7 @@ class AL
      * @param string $table
      * @return string
      */
-    private function pk_field($table)
+    public function pk_field($table)
     {
         return $table[0]."_id";
     }
