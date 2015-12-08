@@ -7,29 +7,10 @@ require_once('lib/TableRecord.class.php');
 class User extends TableRecord
 {
     protected $props = array();
-    private $fields = array('u_id', 'u_email', 'u_password', 'u_nickname', 'u_birthdate', 'u_about_myself', 'u_picture', 'u_secret_pic');
-    private $table = 'users';
-    private $primary_key = 'u_id';
+    protected $fields = array('u_id', 'u_email', 'u_password', 'u_nickname', 'u_birthdate', 'u_about_myself', 'u_picture', 'u_secret_pic');
+    protected $table = 'users';
+    protected $primary_key = 'u_id';
 
-
-    private $al = null;
-
-    public function setProps($props)
-    {
-        $this->props = $this->pickElements($props, $this->fields);
-    }
-
-    public function getProps()
-    {
-        return $this->props;
-    }
-
-    public function __construct($props = array())
-    {
-        global $config;
-        $this->al = new AL($config['database']);
-        $this->setProps($props);
-    }
 
     public function createAndGet()
     {

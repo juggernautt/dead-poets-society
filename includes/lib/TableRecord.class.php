@@ -2,19 +2,41 @@
 require_once($_SERVER['DOCUMENT_ROOT'].'/../includes/init.php');
 require_once('lib/DAL.php');
 
-class TableRecord
+abstract class TableRecord
 {
     /**
-     *
      * @var array
      */
     protected $props;
+    protected $fields;
+
+    protected $table;
+    protected $primary_key;
+    protected $primary_key_value;
+    protected $al = null;
+
+    public function __construct($props = array())
+    {
+        global $config;
+        $this->al = new AL($config['database']);
+        $this->setProps($props);
+    }
+
+
+    public function setProps($props)
+    {
+        $this->props = $this->pickElements($props, $this->fields);
+    }
+
+    public function getProps()
+    {
+        return $this->props;
+    }
 
 
     /**
      * Return elements with $keys from $array
      * pickElements(['a'=>1,'b'=>2,'c'=>3], ['a','c','l']) => ['a'=>1, 'c'=>3]
-     *
      * @param $array
      * @param $keys
      * @return array
