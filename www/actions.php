@@ -34,7 +34,8 @@ if ($action == "Activate profile")
 
 if ($action == "Accept")
 {
-    $acceptedUser = acceptFriendship($_SESSION['loggedInUser']['u_id'], $_POST['u_id']);
+    $props = array('u_id1' => $_SESSION['loggedInUser']['u_id'], 'u_id2' => $_POST['u_id'], 'r_status' => 'FRIENDS');
+    $acceptedUser = acceptFriendship($props);
     $result = array(
         'u_about_myself' => $acceptedUser['u_about_myself'],
         'u_secret_pic' => $acceptedUser['u_secret_pic'],

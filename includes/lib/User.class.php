@@ -7,28 +7,28 @@ require_once('lib/TableRecord.class.php');
 class User extends TableRecord
 {
     protected $props = array();
-    protected $fields = array('u_id', 'u_email', 'u_password', 'u_nickname', 'u_birthdate', 'u_about_myself', 'u_picture', 'u_secret_pic');
+    protected $fields = array('u_email', 'u_password', 'u_nickname', 'u_birthdate', 'u_about_myself', 'u_picture', 'u_secret_pic');
     protected $table = 'users';
-    protected $primary_key = 'u_id';
 
 
-    public function createAndGet()
-    {
-        $errors =$this->getErrors(true);
-        if(count($errors) == 0) {
-            return $this->al->insert_one($this->table, $this->props);
-        }
-        return $errors;
-    }
 
-    public function updateAndGet()
-    {
-        $errors = $this->getErrors(false);
-        if(count($errors) == 0) {
-            return $this->al->update_one($this->table, $this->props['u_id'], $this->props);
-        }
-        return $errors;
-    }
+//    public function createAndGet()
+//    {
+//        $errors =$this->getErrors(true);
+//        if(count($errors) == 0) {
+//            return $this->al->insert_one($this->table, $this->props);
+//        }
+//        return $errors;
+//    }
+//
+//    public function updateAndGet()
+//    {
+//        $errors = $this->getErrors(false);
+//        if(count($errors) == 0) {
+//            return $this->al->update_one($this->table, $this->props['u_id'], $this->props);
+//        }
+//        return $errors;
+//    }
 
 
 
@@ -38,17 +38,17 @@ class User extends TableRecord
     }
 
 
-
-
     public function deactivate($id)
     {
-        return $this->al->update_one('users', $id, array('u_is_frozen_account' => 1));
+        return $this->al->update_one($this->table, $id, array('u_is_frozen_account' => 1));
     }
+
 
     public function activate($id)
     {
-        return $this->al->update_one('users', $id, array('u_is_frozen_account' => 0));
+        return $this->al->update_one($this->table, $id, array('u_is_frozen_account' => 0));
     }
+
 
     public function authorize($props)
     {

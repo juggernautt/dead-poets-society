@@ -12,15 +12,16 @@ require_once('lib/AL.php');
  */
 function selectUser($u_id)
 {
-    $u = new User();
-    return $u->selectById($u_id);
+    $u = TableRecord::getRecord('users', $u_id);
+    return $u->getProps(TRUE);
 }
 
 
 function createNewPost($props)
 {
     $p = new Post($props);
-    return $p->createAndGet();
+    $p->save();
+    return $p->getProps(TRUE);
 }
 
 /**
@@ -62,30 +63,20 @@ function isDeactivated($u_id)
 function addFriend($props)
 {
     $r = new Relationship($props);
-    return $r->add();
+    $r->save();
+    return $r->getProps(TRUE);
 }
 
 /**
- * @param $my_id
- * @param $other_id
+ * @param array
  * @return array|false
  */
-function acceptFriendship($my_id, $other_id)
+function acceptFriendship($props)
 {
-    global $config;
-    $al = new AL($config['database']);
-
-    $props = array(
-        'u_id1' => $my_id,
-        'u_id2' => $other_id,
-        'r_status' => 'FRIENDS'
-    );
-    $preds = array(
-        'u_id1' => $other_id,
-        'u_id2' => $my_id,
-        'r_status' => 'REQUEST_SENT'
-    );
-    return $al->update_many('relationships', $preds, $props);
+    $r = TableRecord::getRecord('relationship', $props['r_id']);
+//    $r->setProps()
+    $r = new Relationship($props);
+    return $r->accept();
 }
 
 /**
@@ -275,14 +266,17 @@ function selectEmailAndPasswordLogInProcess($props)
 function addNewUser($props)
 {
     $u = new User($props);
-    return $u->createAndGet();
+    $u->save();
+    return $u->getProps(TRUE);
 }
 
 
 function updateExistingUser($props)
 {
-    $u = new User($props);
-    return $u->updateAndGet();
+    $u = TableRecord::getRecord('user', $props['u_id']);
+    $u->setProps($props);
+    $u->save();
+    return $u->getProps(TRUE);
 }
 
 /**
@@ -330,5 +324,14 @@ function getRelationshipStatus($my_id, $other_id)
     return null;
 }
 
+/**
+ * @param $my_id
+ * @param $other_id
+ * @return array
+ */
+function getRelationship($my_id, $other_id)
+{
+
+}
 
 

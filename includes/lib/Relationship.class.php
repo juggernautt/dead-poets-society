@@ -15,27 +15,31 @@ class Relationship extends TableRecord
     const HIS_DECLINE = "HIS DECLINE";
 
     protected $props = array();
-    protected $fields = array('r_id', 'u_id1', 'u_id2', 'r_status', 'r_updated_at');
+    protected $fields = array('u_id1', 'u_id2', 'r_status', 'r_updated_at');
     protected $table = 'relationship';
-    protected $primary_key = 'r_id';
 
 
 
-    public function add()
-    {
-        return $this->al->insert_one($this->table, $this->props);
-    }
+
+//    public function add()
+//    {
+//        return $this->al->insert_one($this->table, $this->props);
+//    }
 
 
-    public function acceptFriendship()
+    public function accept()
     {
         $newProps = [
             'u_id1' => $this->props['u_id2'],
             'u_id2' => $this->props['u_id1'],
             'r_status' => 'FRIENDS'
         ];
-        return $this->al->update_many('relationships', $this->props, $newProps);
+        $this->setProps($newProps);
+        return $this->save();
+//        $this->al->update_many('relationships', $this->props, $newProps);
     }
+
+
 
 
 }

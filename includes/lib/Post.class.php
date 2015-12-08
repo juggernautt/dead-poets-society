@@ -7,10 +7,9 @@ require_once('lib/TableRecord.class.php');
 class Post extends TableRecord
 {
     protected $props = array();
-    protected $fields = array('p_id', 'u_id', 'p_text', 'p_date');
+    protected $fields = array('u_id', 'p_text', 'p_date');
     protected $table = 'posts';
-    protected $primary_key = 'p_id';
-    //private $primary_key_value = null;
+
 
 
 
@@ -21,13 +20,13 @@ class Post extends TableRecord
         return true;
     }
 
-    public function createAndGet()
-    {
-        $isValid = $this->getErrors();
-        if($isValid) {
-           return $this->al->insert_one($this->table, $this->props);
-        }
-        return false;
-    }
+//    public function createAndGet()
+//    {
+//        $isValid = $this->getErrors();
+//        if($isValid) {
+//           return $this->al->insert_one($this->table, $this->props);
+//        }
+//        return false;
+//    }
 
 }
