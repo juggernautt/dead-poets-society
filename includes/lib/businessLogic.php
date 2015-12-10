@@ -30,7 +30,7 @@ function createNewPost($props)
  */
 function deactivateProfile($u_id)
 {
-    $u = new User();
+    $u = TableRecord::getRecord('users', $u_id);
     return $u->deactivate($u_id);
 }
 
@@ -40,7 +40,7 @@ function deactivateProfile($u_id)
  */
 function activateProfile($u_id)
 {
-    $u = new User();
+    $u = TableRecord::getRecord('users', $u_id);
     return $u->activate($u_id);
 }
 
@@ -50,9 +50,9 @@ function activateProfile($u_id)
  */
 function isDeactivated($u_id)
 {
-    $u = new User();
-    $user = $u->selectById($u_id);
-    return $user ? $user['u_is_frozen_account'] : false;
+    $u = TableRecord::getRecord('users', $u_id);
+    $isFrozen = $u->getProp('u_is_frozen_account');
+    return $isFrozen;
 }
 
 
@@ -74,32 +74,20 @@ function addFriend($props)
 function acceptFriendship($props)
 {
     $r = TableRecord::getRecord('relationship', $props['r_id']);
-//    $r->setProps()
-    $r = new Relationship($props);
-    return $r->accept();
+    $r->accept();
+    $u = TableRecord::getRecord('users', $props['u_id']);
+    return $u->getProps(TRUE);
 }
 
 /**
- * @param $my_id
- * @param $other_id
+ * @param array
  * @return array|bool|false
  */
-function declineFriendship($my_id, $other_id)
+function declineFriendship($props)
 {
-    global $config;
-    $al = new AL($config['database']);
-    $props = array(
-        'u_id1' => $my_id,
-        'u_id2' => $other_id,
-        'r_status' => 'DECLINED',
-        'r_updated_at' => date('d/m/Y')
-    );
-    $preds = array(
-        'u_id1' => $other_id,
-        'u_id2' => $my_id,
-        'r_status' => 'REQUEST_SENT'
-    );
-    return $al->update_many('relationship', $preds, $props);
+
+    $r = TableRecord::getRecord('relationship', $props['r_id']);
+    return $r->decline();
 }
 
 /**
@@ -156,101 +144,48 @@ function regretAndBecomeFriends($my_id, $other_id)
  */
 function selectUserPosts($u_id)
 {
-    global $config;
-    $al = new AL($config['database']);
-    $sql = "SELECT * FROM `posts` WHERE u_id= ? ORDER BY p_date DESC";
-    $posts = $al->query($sql, [$u_id]);
-    if (!$posts) {
-        return false;
-    }
-    return $posts;
+    return Post::selectAll($u_id);
 }
 
 
-function isRelationship($my_id, $other_id)
-{
-    global $config;
-    $al = new AL($config['database']);
-    $preds1 = array(
-        'u_id1' => $my_id,
-        'u_id2' => $other_id
 
-    );
-    $preds2 = array(
-        'u_id1' => $other_id,
-        'u_id2' => $my_id
-    );
-    $res = $al->select_many('relationship', $preds1);
-    return $res ? $res : $al->select_many('relationship', $preds2);
-}
 
 /**
- * @param $my_id
- * @param $order_by
+ * @param array
  * @return array|bool
  */
-function selectAllActiveUsers($my_id, $order_by)
+function selectAllActiveUsers($props)
 {
-    global $config;
-    $al = new AL($config['database']);
-    $sql = "SELECT * FROM `users` WHERE u_id!=? AND u_is_frozen_account != 1 ORDER BY `u_nickname` $order_by";
-    $users = $al->query($sql, [$my_id]);
-    if (!$users) {
-        return false;
-    }
-    return $users;
+   return User::selectAllActive($props);
 }
 
 
 /**
- * @param $my_id
- * @param $order_by
+ * @param array
  * @return array|bool
  */
-function selectActiveUserFriends($my_id, $order_by)
+function selectActiveUserFriends($props)
 {
-    global $config;
-    $al = new AL($config['database']);
-    $sql = "SELECT * FROM `users` LEFT JOIN `relationship` ON (users.u_id=relationship.u_id1 OR users.u_id=relationship.u_id2)
-            WHERE r_status='FRIENDS' AND u_is_frozen_account != 1 AND u_id!= ? AND (u_id1= ? OR u_id2 = ?) ORDER BY  `u_nickname` $order_by";
-    $userFriends = $al->query($sql, [$my_id, $my_id, $my_id]);
-    if (!$userFriends) {
-        return false;
-    }
-    return $userFriends;
+    return User::selectActiveFriends($props);
 }
 
 
 /**
- * @param $my_id
+ * @param $id
  * @return array|bool|false
  */
-function selectRequests($my_id)
+function selectRequests($id)
 {
-    global $config;
-    $al = new AL($config['database']);
-    $sql = "SELECT * FROM  `users` LEFT JOIN `relationship` ON users.u_id=relationship.u_id1 WHERE r_status='REQUEST_SENT' AND u_id2= ? AND u_is_frozen_account != 1";
-    $requests = $al->query($sql, [$my_id]);
-    if (!$requests) {
-        return false;
-    }
-    return $requests;
+    return Relationship::allRequests($id);
 }
 
 /**
- * @param $my_id
+ * @param $id
  * @return array|bool|false
  */
-function selectDeclines($my_id)
+function selectDeclines($id)
 {
-    global $config;
-    $al = new AL($config['database']);
-    $sql = "SELECT * FROM  `users` LEFT JOIN `relationship` ON users.u_id=relationship.u_id2 WHERE r_status='DECLINED' AND u_is_frozen_account != 1 AND u_id1= ? ";
-    $declines = $al->query($sql, [$my_id]);
-    if (!$declines) {
-        return false;
-    }
-    return $declines;
+    return Relationship::allDeclines($id);
 }
 
 /**
@@ -279,6 +214,25 @@ function updateExistingUser($props)
     return $u->getProps(TRUE);
 }
 
+
+
+function getRelationship($my_id, $other_id)
+{
+    global $config;
+    $al = new AL($config['database']);
+    $preds1 = array(
+        'u_id1' => $my_id,
+        'u_id2' => $other_id
+
+    );
+    $preds2 = array(
+        'u_id1' => $other_id,
+        'u_id2' => $my_id
+    );
+    $res = $al->select_many('relationship', $preds1);
+    return $res ? $res : $al->select_many('relationship', $preds2);
+}
+
 /**
  * @param $my_id
  * @param $other_id
@@ -290,7 +244,7 @@ function getRelationshipStatus($my_id, $other_id)
     global $config;
     $al = new AL($config['database']);
 
-    $res = isRelationship($my_id, $other_id);
+    $res = getRelationship($my_id, $other_id);
     if (!$res) {
         return NO_RELATIONSHIP;
     }
@@ -324,14 +278,5 @@ function getRelationshipStatus($my_id, $other_id)
     return null;
 }
 
-/**
- * @param $my_id
- * @param $other_id
- * @return array
- */
-function getRelationship($my_id, $other_id)
-{
-
-}
 
 

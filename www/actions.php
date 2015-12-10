@@ -34,7 +34,7 @@ if ($action == "Activate profile")
 
 if ($action == "Accept")
 {
-    $props = array('u_id1' => $_SESSION['loggedInUser']['u_id'], 'u_id2' => $_POST['u_id'], 'r_status' => 'FRIENDS');
+    $props = array('u_id' => $_POST['u_id'], 'r_id' => $_POST['r_id']);
     $acceptedUser = acceptFriendship($props);
     $result = array(
         'u_about_myself' => $acceptedUser['u_about_myself'],
@@ -56,7 +56,8 @@ if ($action == "Add Friend")
 
 if ($action == "Decline")
 {
-    declineFriendship($_SESSION['loggedInUser']['u_id'], $_POST['u_id']);
+    $props = array('u_id' => $_POST['u_id'], 'r_id' => $_POST['r_id']);
+    declineFriendship($props);
     print json_encode($_POST['u_id']);
     return;
 }

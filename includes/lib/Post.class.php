@@ -20,13 +20,15 @@ class Post extends TableRecord
         return true;
     }
 
-//    public function createAndGet()
-//    {
-//        $isValid = $this->getErrors();
-//        if($isValid) {
-//           return $this->al->insert_one($this->table, $this->props);
-//        }
-//        return false;
-//    }
+    public static function selectAll($id) {
+        global $config;
+        $al = new AL($config['database']);
+        $sql = "SELECT * FROM `posts` WHERE u_id= ? ORDER BY p_date DESC";
+        $posts = $al->query($sql, [$id]);
+        if (!$posts) {
+            return false;
+        }
+        return $posts;
+    }
 
 }

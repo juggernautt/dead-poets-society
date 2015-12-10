@@ -66,6 +66,7 @@ if (isset($_GET['u_id'])) {
                     ?>
                     <form method="post">
                         <input type="hidden" name="u_id" id="u_id" value="<?= $user['u_id']; ?>">
+                        <input type="hidden" name="r_id" id="r_id" value="<?= $rr['r_id']; ?>">
                         <?php if ($relationship == NO_RELATIONSHIP) { ?>
 
                             <input type="button" id="add-friend" name="action" class="btn btn-default"
@@ -89,7 +90,7 @@ if (isset($_GET['u_id'])) {
                     <?php //request and decline message
                     if ($relationship != NO_RELATIONSHIP) {
 
-                        $currentRel = isRelationship($_SESSION['loggedInUser']['u_id'], $_GET['u_id']);
+                        $currentRel = getRelationship($_SESSION['loggedInUser']['u_id'], $_GET['u_id']);
 
                         if ($relationship == MINE_REQUEST || $relationship == HIS_DECLINE) {
                             echo 'Request was sent to user ' . date('d/m/Y', strtotime($currentRel['r_updated_at']));

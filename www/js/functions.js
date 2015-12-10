@@ -57,11 +57,13 @@ $(document).ready(function() {
 
     //clicking on accept button, show secret data and show unfriend button. index page
     relationshipButtonsIndex.on('click', '[action=accept]', function() {
-        var id =  $('#u_id').val();
-        var data2send = {
-            u_id: id,
-            action: "Accept"
-        };
+        var u_id =  $('#u_id').val(),
+            r_id =  $('#r_id').val(),
+            data2send = {
+                u_id: u_id,
+                r_id: r_id,
+                action: "Accept"
+            };
         var successCallback = function(serverResult) {
             debugger;
             if(serverResult) {
@@ -87,9 +89,11 @@ $(document).ready(function() {
 
     //clicking on decline button, show decline message. index page
     relationshipButtonsIndex.on('click', '[action=decline]', function() {
-        var id =  $('#u_id').val();
-        var data2send = {
-            u_id: id,
+        var u_id =  $('#u_id').val(),
+            r_id =  $('#r_id').val(),
+            data2send = {
+            u_id: u_id,
+            r_id: r_id,
             action: "Decline"
         };
         var successCallback = function(serverResult) {
@@ -200,9 +204,11 @@ $(document).ready(function() {
     });
     //when clicking on decline button the user will move to the decline list. relationship page
     requestDiv.on('click', '[action=decline]', function() {
-        var id = $(this).parent().find('input[type=hidden]').val(),
+        var r_id = $(this).parent().find('.r_id').val(),
+            u_id = $(this).parent().find('.u_id').val(),
             data2send = {
-                u_id: id,
+                u_id: u_id,
+                r_id: r_id,
                 action: "Decline"
             };
         var successCallback = function(serverResult) {
@@ -222,9 +228,11 @@ $(document).ready(function() {
     });
     //when clicking on accept button the user will move to friend list. relationship page
     requestDiv.on('click', '[action=accept]', function() {
-        var id = $(this).parent().find('input[type=hidden]').val(),
+        var r_id = $(this).parent().find('.r_id').val(),
+            u_id = $(this).parent().find('.u_id').val(),
             data2send = {
-                u_id: id,
+                r_id: r_id,
+                u_id: u_id,
                 action: "Accept"
             };
         var successCallback = function(serverResult) {

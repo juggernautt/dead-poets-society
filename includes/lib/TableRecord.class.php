@@ -43,7 +43,6 @@ abstract class TableRecord
 
         if(isset($props[$this->primary_key])) {
             $this->primary_key_value = $props[$this->primary_key];
-            unset($props[$this->primary_key]);
         }
 
         $this->setProps($props);
@@ -53,6 +52,12 @@ abstract class TableRecord
     public function setProps($props)
     {
         $this->props = $this->pickElements($props, $this->fields);
+    }
+
+    public function setProp($propName, $propValue)
+    {
+        $this->props[$propName] = $propValue;
+        return $propValue;
     }
 
     public function getProps($isIncludePk = false)
@@ -98,22 +103,21 @@ abstract class TableRecord
         global $config;
         $al = new AL($config['database']);
         $record = $al->select_one($table, $id);
-        if($table == 'users') {
-            return new User($record);
+        switch ($table) {
+            case 'users':
+                return new User($record);
+                break;
+            case 'posts':
+                return new Post($record);
+                break;
+            case 'relationship':
+                return new Relationship($record);
+                break;
         }
-        if($table == 'posts') {
-            return new Post($record);
-        }
-        if($table == 'relationship') {
-            return new Relationship($record);
-        }
+        return false;
     }
 
-    public static function getRecords($table) {
-        global $config;
-        $al = new AL($config['database']);
-        return $al->select_all($table);
-    }
+
 
 
 }

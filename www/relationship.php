@@ -30,7 +30,8 @@ is_logged_in();
                             <p><?= $request['u_nickname']; ?></p>
 
                             <form method="post">
-                                <input type="hidden" name="u_id" value="<?= $request['u_id']; ?>">
+                                <input type="hidden" name="r_id" class="r_id" value="<?= $request['r_id']; ?>">
+                                <input type="hidden" name="u_id" class="u_id" value="<?= $request['u_id']; ?>">
                                 <input type="button" class="btn btn-default" name="action" value="Accept"
                                        action="accept">
                                 <input type="button" class="btn btn-danger" name="action" value="Decline"
@@ -46,7 +47,8 @@ is_logged_in();
 
                     <?php
                     //list of the user's friends. each item contains unfriend button(delete friendship)
-                    $friends = selectActiveUserFriends($_SESSION['loggedInUser']['u_id'], "ASC");
+                    $props = array('id' => $_SESSION['loggedInUser']['u_id'], 'order_by' => "ASC");
+                    $friends = selectActiveUserFriends($props);
 
                     foreach ($friends as $friend) { ?>
                         <div class="relationship" u_id="<?= $friend['u_id'] ?>">
@@ -83,6 +85,7 @@ is_logged_in();
                             <p><?= $decline['u_nickname']; ?></p>
 
                             <form method="post">
+                                <input type="hidden" name="r_id" class="r_id" value="<?= $decline['r_id']; ?>">
                                 <input type="hidden" name="u_id" value="<?= $decline['u_id']; ?>">
                                 <input type="button" class="btn btn-default" name="action" value="Regret button"
                                        action="regret">

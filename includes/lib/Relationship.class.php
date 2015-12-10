@@ -19,26 +19,43 @@ class Relationship extends TableRecord
     protected $table = 'relationship';
 
 
-
-
-//    public function add()
-//    {
-//        return $this->al->insert_one($this->table, $this->props);
-//    }
-
-
     public function accept()
     {
-        $newProps = [
-            'u_id1' => $this->props['u_id2'],
-            'u_id2' => $this->props['u_id1'],
-            'r_status' => 'FRIENDS'
-        ];
-        $this->setProps($newProps);
+
+        $this->setProp('r_status', 'FRIENDS');
         return $this->save();
-//        $this->al->update_many('relationships', $this->props, $newProps);
     }
 
+    public function decline()
+    {
+        $this->setProp('r_status', 'DECLINED');
+        return $this->save();
+    }
+
+
+    public static function allRequests($id)
+    {
+        global $config;
+        $al = new AL($config['database']);
+        $sql = "SELECT * FROM  `users` LEFT JOIN `relationship` ON users.u_id=relationship.u_id1 WHERE r_status='REQUEST_SENT' AND u_id2= ? AND u_is_frozen_account != 1";
+        $requests = $al->query($sql, [$id]);
+        if (!$requests) {
+            return false;
+        }
+        return $requests;
+    }
+
+    public static function allDeclines($id)
+    {
+        global $config;
+        $al = new AL($config['database']);
+        $sql = "SELECT * FROM  `users` LEFT JOIN `relationship` ON users.u_id=relationship.u_id2 WHERE r_status='DECLINED' AND u_is_frozen_account != 1 AND u_id1= ? ";
+        $declines = $al->query($sql, [$id]);
+        if (!$declines) {
+            return false;
+        }
+        return $declines;
+    }
 
 
 

@@ -8,11 +8,12 @@ require_once('lib/businessLogic.php');
 is_logged_in();
 
 //show all users
+$props = array('id' => $_SESSION['loggedInUser']['u_id'], 'order_by' => "ASC");
 if ($_GET['show'] == 'all') {
-    $users = selectAllActiveUsers($_SESSION['loggedInUser']['u_id'], "ASC");
+    $users = selectAllActiveUsers($props);
 } else {
     //show only user friends
-    $users = selectActiveUserFriends($_SESSION['loggedInUser']['u_id'], "ASC");
+    $users = selectActiveUserFriends($props);
 }
 
 ?>

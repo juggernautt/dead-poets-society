@@ -41,6 +41,7 @@ class AL
         return $res;
     }
 
+
     public function select_many($table, $predicates)
     {
         $preds = $this->array_with_keys($predicates);

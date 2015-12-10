@@ -7,29 +7,8 @@ require_once('lib/TableRecord.class.php');
 class User extends TableRecord
 {
     protected $props = array();
-    protected $fields = array('u_email', 'u_password', 'u_nickname', 'u_birthdate', 'u_about_myself', 'u_picture', 'u_secret_pic');
+    protected $fields = array('u_email', 'u_password', 'u_nickname', 'u_birthdate', 'u_about_myself', 'u_picture', 'u_secret_pic', 'u_is_frozen_account');
     protected $table = 'users';
-
-
-
-//    public function createAndGet()
-//    {
-//        $errors =$this->getErrors(true);
-//        if(count($errors) == 0) {
-//            return $this->al->insert_one($this->table, $this->props);
-//        }
-//        return $errors;
-//    }
-//
-//    public function updateAndGet()
-//    {
-//        $errors = $this->getErrors(false);
-//        if(count($errors) == 0) {
-//            return $this->al->update_one($this->table, $this->props['u_id'], $this->props);
-//        }
-//        return $errors;
-//    }
-
 
 
     public function selectById($id)
@@ -58,6 +37,33 @@ class User extends TableRecord
         );
         return $this->al->select_many($this->table, $preds);
     }
+
+
+
+    public static function selectAllActive($props) {
+        global $config;
+        $al = new AL($config['database']);
+        $sql = "SELECT * FROM `users` WHERE u_id!=? AND u_is_frozen_account != 1 ORDER BY `u_nickname` {$props['order_by']}";
+        $users = $al->query($sql, [$props['id']]);
+        if (!$users) {
+            return false;
+        }
+        return $users;
+    }
+
+    public static function selectActiveFriends($props) {
+        global $config;
+        $al = new AL($config['database']);
+        $sql = "SELECT * FROM `users` LEFT JOIN `relationship` ON (users.u_id=relationship.u_id1 OR users.u_id=relationship.u_id2)
+            WHERE r_status='FRIENDS' AND u_is_frozen_account != 1 AND u_id!= ? AND (u_id1= ? OR u_id2 = ?) ORDER BY  `u_nickname` {$props['order_by']}";
+        $userFriends = $al->query($sql, [$props['id'], $props['id'], $props['id']]);
+        if (!$userFriends) {
+            return false;
+        }
+        return $userFriends;
+    }
+
+
 
 
     public function getErrors($isToCheckMail)
