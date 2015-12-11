@@ -65,7 +65,8 @@ if ($action == "Decline")
 
 if ($action == "Unfriend")
 {
-    unFriend($_SESSION['loggedInUser']['u_id'], $_POST['u_id']);
+    $props = array('u_id' => $_POST['u_id'], 'r_id' => $_POST['r_id']);
+    unFriend($props);
     print json_encode($_POST['u_id']);
     return;
 
@@ -73,7 +74,8 @@ if ($action == "Unfriend")
 
 if ($action == "Regret button")
 {
-    regretAndBecomeFriends($_SESSION['loggedInUser']['u_id'], $_POST['u_id']);
+    $props = array('u_id' => $_POST['u_id'], 'r_id' => $_POST['r_id']);
+    regretAndBecomeFriends($props);
     print json_encode($_POST['u_id']);
     return;
 }

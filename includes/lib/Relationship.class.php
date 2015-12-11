@@ -32,6 +32,17 @@ class Relationship extends TableRecord
         return $this->save();
     }
 
+    public function unFriend($id)
+    {
+        return $this->al->delete_one($this->table, $id);
+    }
+
+    public function regret()
+    {
+        $this->setProp('r_status', 'FRIENDS');
+        return $this->save();
+    }
+
 
     public static function allRequests($id)
     {

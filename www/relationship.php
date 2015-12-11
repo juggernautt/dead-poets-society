@@ -59,7 +59,8 @@ is_logged_in();
                             <p><?= $friend['u_nickname']; ?></p>
 
                             <form method="post">
-                                <input type="hidden" name="u_id" value="<?= $friend['u_id']; ?>">
+                                <input type="hidden" name="u_id" class="u_id" value="<?= $friend['u_id']; ?>">
+                                <input type="hidden" name="r_id" class="r_id" value="<?= $friend['r_id']; ?>">
                                 <input type="button" class="btn btn-danger" name="action" value="Unfriend"
                                        action="unfriend">
                             </form>
@@ -86,7 +87,7 @@ is_logged_in();
 
                             <form method="post">
                                 <input type="hidden" name="r_id" class="r_id" value="<?= $decline['r_id']; ?>">
-                                <input type="hidden" name="u_id" value="<?= $decline['u_id']; ?>">
+                                <input type="hidden" name="u_id" class="u_id" value="<?= $decline['u_id']; ?>">
                                 <input type="button" class="btn btn-default" name="action" value="Regret button"
                                        action="regret">
                             </form>

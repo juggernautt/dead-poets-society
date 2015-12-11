@@ -91,50 +91,23 @@ function declineFriendship($props)
 }
 
 /**
- * @param $my_id
- * @param $other_id
+ * @param array
  * @return array|bool|false
  */
-function unFriend($my_id, $other_id)
+function unFriend($props)
 {
-    global $config;
-    $al = new AL($config['database']);
-    $preds1 = array(
-        'u_id1' => $my_id,
-        'u_id2' => $other_id,
-        'r_status' => 'FRIENDS'
-    );
-    $preds2 = array(
-        'u_id1' => $other_id,
-        'u_id2' => $my_id,
-        'r_status' => 'FRIENDS'
-    );
-    $res1 = $al->delete_many('relationship', $preds1);
-    $res2 = $al->delete_many('relationship', $preds2);
-    return $res1 || $res2;
+    $r = TableRecord::getRecord('relationship', $props['r_id']);
+    return $r->unFriend($props['r_id']);
 }
 
 /**
- * @param $my_id
- * @param $other_id
+ * @param array
  * @return array|bool|false
  */
-function regretAndBecomeFriends($my_id, $other_id)
+function regretAndBecomeFriends($props)
 {
-    global $config;
-    $al = new AL($config['database']);
-
-    $props = array(
-        'u_id1' => $my_id,
-        'u_id2' => $other_id,
-        'r_status' => 'FRIENDS'
-    );
-    $preds = array(
-        'u_id1' => $my_id,
-        'u_id2' => $other_id,
-        'r_status' => 'DECLINED'
-    );
-    return $al->update_many('relationship', $preds, $props);
+    $r = TableRecord::getRecord('relationship', $props['r_id']);
+    return $r->regret();
 }
 
 
