@@ -13,8 +13,9 @@ $relationship = null;
 if (isset($_GET['u_id'])) {
     $user = selectUser($_GET['u_id']);
     $mineProfile = false;
-    $relationship = getRelationshipStatus($_SESSION['loggedInUser']['u_id'], $_GET['u_id']);
-    $rr = getRelationship($_SESSION['loggedInUser']['u_id'], $_GET['u_id']);
+    $props = array('my_id' => $_SESSION['loggedInUser']['u_id'], 'other_id' => $_GET['u_id']);
+    $relationship = getRelationshipStatus($props);
+    $rr = getRelationship($props);
 } else {
     //index of a currently logged in user
     $user = selectUser($_SESSION['loggedInUser']['u_id']);
@@ -90,13 +91,11 @@ if (isset($_GET['u_id'])) {
                     <?php //request and decline message
                     if ($relationship != NO_RELATIONSHIP) {
 
-                        $currentRel = getRelationship($_SESSION['loggedInUser']['u_id'], $_GET['u_id']);
-
                         if ($relationship == MINE_REQUEST || $relationship == HIS_DECLINE) {
-                            echo 'Request was sent to user ' . date('d/m/Y', strtotime($currentRel['r_updated_at']));
+                            echo 'Request was sent to user ' . date('d/m/Y', strtotime($rr['r_updated_at']));
                         }
                         if ($relationship == MINE_DECLINE) {
-                            echo 'Friendship was declined ' . date('d/m/Y', strtotime($currentRel['r_updated_at']));
+                            echo 'Friendship was declined ' . date('d/m/Y', strtotime($rr['r_updated_at']));
 
                         }
                     }

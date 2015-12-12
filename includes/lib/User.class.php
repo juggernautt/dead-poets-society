@@ -11,12 +11,6 @@ class User extends TableRecord
     protected $table = 'users';
 
 
-    public function selectById($id)
-    {
-        return $this->al->select_one($this->table, $id);
-    }
-
-
     public function deactivate($id)
     {
         return $this->al->update_one($this->table, $id, array('u_is_frozen_account' => 1));

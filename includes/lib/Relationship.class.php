@@ -19,7 +19,7 @@ class Relationship extends TableRecord
     protected $table = 'relationship';
 
 
-    public function accept()
+    public function acceptOrRegret()
     {
 
         $this->setProp('r_status', 'FRIENDS');
@@ -37,10 +37,48 @@ class Relationship extends TableRecord
         return $this->al->delete_one($this->table, $id);
     }
 
-    public function regret()
+    /**
+     * @param array
+     * @return array|bool
+     */
+    public function isExist($props)
     {
-        $this->setProp('r_status', 'FRIENDS');
-        return $this->save();
+        $predicates1 = array(
+            'u_id1' => $props['my_id'],
+            'u_id2' => $props['other_id']
+
+        );
+        $predicates2 = array(
+            'u_id1' => $props['other_id'],
+            'u_id2' => $props['my_id']
+        );
+        $res = $this->al->select_many($this->table, $predicates1);
+        return $res ? $res : $this->al->select_many($this->table, $predicates2);
+    }
+
+
+    public function getStatus($props)
+    {
+        $result = $this->isExist($props);
+        if(!$result) {
+            return Relationship::NO_RELATIONSHIP;
+        }
+        if($result['r_status'] == 'FRIENDS') {
+            return Relationship::FRIENDS;
+        }
+        if($result['r_status'] == 'REQUEST_SENT' && $result['u_id1'] == $props['my_id']) {
+            return Relationship::MINE_REQUEST;
+        }
+        if($result['r_status'] == 'REQUEST_SENT' && $result['u_id2'] == $props['my_id']) {
+            return Relationship::HIS_REQUEST;
+        }
+        if($result['r_status'] == 'DECLINED' && $result['u_id1'] == $props['my_id']) {
+            return Relationship::MINE_DECLINE;
+        }
+        if($result['r_status'] == 'DECLINED' && $result['u_id2'] == $props['my_id']) {
+            return Relationship::HIS_DECLINE;
+        }
+        return null;
     }
 
 

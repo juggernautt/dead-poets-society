@@ -74,7 +74,7 @@ function addFriend($props)
 function acceptFriendship($props)
 {
     $r = TableRecord::getRecord('relationship', $props['r_id']);
-    $r->accept();
+    $r->acceptOrRegret();
     $u = TableRecord::getRecord('users', $props['u_id']);
     return $u->getProps(TRUE);
 }
@@ -107,7 +107,7 @@ function unFriend($props)
 function regretAndBecomeFriends($props)
 {
     $r = TableRecord::getRecord('relationship', $props['r_id']);
-    return $r->regret();
+    return $r->acceptOrRegret();
 }
 
 
@@ -189,66 +189,20 @@ function updateExistingUser($props)
 
 
 
-function getRelationship($my_id, $other_id)
+function getRelationship($props)
 {
-    global $config;
-    $al = new AL($config['database']);
-    $preds1 = array(
-        'u_id1' => $my_id,
-        'u_id2' => $other_id
-
-    );
-    $preds2 = array(
-        'u_id1' => $other_id,
-        'u_id2' => $my_id
-    );
-    $res = $al->select_many('relationship', $preds1);
-    return $res ? $res : $al->select_many('relationship', $preds2);
+    $r = new Relationship();
+    return $r->isExist($props);
 }
 
 /**
- * @param $my_id
- * @param $other_id
+ * @param array
  * @return string
  */
-function getRelationshipStatus($my_id, $other_id)
+function getRelationshipStatus($props)
 {
-
-    global $config;
-    $al = new AL($config['database']);
-
-    $res = getRelationship($my_id, $other_id);
-    if (!$res) {
-        return NO_RELATIONSHIP;
-    }
-
-    if ($al->select_many('relationship', ['r_status' => 'FRIENDS', 'u_id1' => $my_id, 'u_id2' => $other_id]) ||
-        $al->select_many('relationship', ['r_status' => 'FRIENDS', 'u_id1' => $other_id, 'u_id2' => $my_id]))
-    {
-        return FRIENDS;
-    }
-
-    $res = $al->select_many('relationship', ['r_status' => 'REQUEST_SENT', 'u_id1' => $my_id, 'u_id2' => $other_id]);
-    if($res) {
-        return MINE_REQUEST;
-    }
-
-    $res = $al->select_many('relationship', ['r_status' => 'REQUEST_SENT', 'u_id1' => $other_id, 'u_id2' => $my_id]);
-    if($res) {
-        return HIS_REQUEST;
-    }
-
-    $res = $al->select_many('relationship', ['r_status' => 'DECLINED', 'u_id1' => $my_id, 'u_id2' => $other_id]);
-    if($res) {
-        return MINE_DECLINE;
-    }
-
-    $res = $al->select_many('relationship', ['r_status' => 'DECLINED', 'u_id1' => $other_id, 'u_id2' => $my_id]);
-    if($res) {
-        return HIS_DECLINE;
-    }
-
-    return null;
+    $r = new Relationship();
+    return $r->getStatus($props);
 }
 
 
