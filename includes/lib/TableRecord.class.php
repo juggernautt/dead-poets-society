@@ -94,6 +94,11 @@ abstract class TableRecord
         return true;
     }
 
+    public function delete()
+    {
+        return $this->al->delete_one($this->table, $this->primary_key_value);
+    }
+
     /**
      * @param string $table
      * @param number $id

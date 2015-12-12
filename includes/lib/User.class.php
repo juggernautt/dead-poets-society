@@ -11,25 +11,47 @@ class User extends TableRecord
     protected $table = 'users';
 
 
-    public function deactivate($id)
+    public function deactivate()
     {
-        return $this->al->update_one($this->table, $id, array('u_is_frozen_account' => 1));
+        $this->setProp('u_is_frozen_account', 1);
+        $this->save();
+        return $this->getProps(TRUE);
     }
 
 
-    public function activate($id)
+    public function activate()
     {
-        return $this->al->update_one($this->table, $id, array('u_is_frozen_account' => 0));
+        $this->setProps('u_is_frozen_account', 0);
+        $this->save();
+        return $this->getProps(TRUE);
+    }
+
+    public function isDeactivated()
+    {
+        return $this->getProp('u_is_frozen_account');
     }
 
 
-    public function authorize($props)
+//    public function authorize($props)
+//    {
+//        $preds = array(
+//            'u_email' => $props['u_email'],
+//            'u_password' => md5($props['u_password'])
+//        );
+//        return $this->al->select_many($this->table, $preds);
+//    }
+
+
+    public static function authorize($email, $password)
     {
+        global $config;
+        $al = new AL($config['database']);
         $preds = array(
-            'u_email' => $props['u_email'],
-            'u_password' => md5($props['u_password'])
+            'u_email' => $email,
+            'u_password' => md5($password)
         );
-        return $this->al->select_many($this->table, $preds);
+        $userProperties =  $al->select_many('users', $preds);
+        return $userProperties ? new User($userProperties) : false;
     }
 
 

@@ -32,16 +32,16 @@ class Relationship extends TableRecord
         return $this->save();
     }
 
-    public function unFriend($id)
+    public function unFriend()
     {
-        return $this->al->delete_one($this->table, $id);
+        return $this->delete();
     }
 
     /**
      * @param array
      * @return array|bool
      */
-    public function isExist($props)
+    public function getRelationship($props)
     {
         $predicates1 = array(
             'u_id1' => $props['my_id'],
@@ -59,7 +59,7 @@ class Relationship extends TableRecord
 
     public function getStatus($props)
     {
-        $result = $this->isExist($props);
+        $result = $this->getRelationship($props);
         if(!$result) {
             return Relationship::NO_RELATIONSHIP;
         }

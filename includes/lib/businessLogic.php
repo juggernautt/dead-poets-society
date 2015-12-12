@@ -31,7 +31,7 @@ function createNewPost($props)
 function deactivateProfile($u_id)
 {
     $u = TableRecord::getRecord('users', $u_id);
-    return $u->deactivate($u_id);
+    return $u->deactivate();
 }
 
 /**
@@ -41,7 +41,7 @@ function deactivateProfile($u_id)
 function activateProfile($u_id)
 {
     $u = TableRecord::getRecord('users', $u_id);
-    return $u->activate($u_id);
+    return $u->activate();
 }
 
 /**
@@ -51,8 +51,7 @@ function activateProfile($u_id)
 function isDeactivated($u_id)
 {
     $u = TableRecord::getRecord('users', $u_id);
-    $isFrozen = $u->getProp('u_is_frozen_account');
-    return $isFrozen;
+    return $u->isDeactivated();
 }
 
 
@@ -97,7 +96,7 @@ function declineFriendship($props)
 function unFriend($props)
 {
     $r = TableRecord::getRecord('relationship', $props['r_id']);
-    return $r->unFriend($props['r_id']);
+    return $r->unFriend();
 }
 
 /**
@@ -167,8 +166,8 @@ function selectDeclines($id)
  */
 function selectEmailAndPasswordLogInProcess($props)
 {
-    $u = new User();
-    return $u->authorize($props);
+    $u = User::authorize($props['u_email'], $props['u_password']);
+    return $u ? $u->getProps(TRUE) : false;
 }
 
 function addNewUser($props)
@@ -192,7 +191,7 @@ function updateExistingUser($props)
 function getRelationship($props)
 {
     $r = new Relationship();
-    return $r->isExist($props);
+    return $r->getRelationship($props);
 }
 
 /**
