@@ -181,7 +181,7 @@ function addNewUser($props)
 
 function updateExistingUser($props)
 {
-    $u = TableRecord::getRecord('user', $props['u_id']);
+    $u = TableRecord::getRecord('users', $props['u_id']);
     $u->setProps($props);
     $u->save();
     return $u->getProps(TRUE);
