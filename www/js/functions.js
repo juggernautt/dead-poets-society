@@ -65,12 +65,11 @@ $(document).ready(function() {
                 action: "Accept"
             };
         var successCallback = function(serverResult) {
-            debugger;
             if(serverResult) {
-                debugger;
                 console.log(serverResult);
                 var button = $('<input type="button" id="unfriend" name="action" class="btn btn-danger" action="unfriend" value="Unfriend">'),
-                    imgSrc = serverResult['u_secret_pic'],
+                    imgSrc = "/userpic.php?u_id=" + serverResult['u_id'] + "&type=private",
+                    //imgSrc = serverResult['u_secret_pic'],
                     text = serverResult['u_about_myself'],
                     daysTillBirthday = serverResult['days'],
                     div = $('<div class="secret"><img src="' + imgSrc + '" width="170" height="235" alt="secret-picture">' +

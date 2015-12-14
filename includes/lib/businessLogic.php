@@ -198,7 +198,7 @@ function updateExistingUser($props)
 
 function getRelationship($my_id, $other_id)
 {
-   return Relationship::getRecord($my_id, $other_id);
+   return Relationship::getRelationship($my_id, $other_id);
 }
 
 /**
