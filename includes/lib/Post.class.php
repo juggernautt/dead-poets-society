@@ -14,7 +14,7 @@ class Post extends TableRecord
 
 
     public function getErrors() {
-        $errors = [];
+        $errors = array();
         if($this->props['p_text'] == "") {
             $errors['p_text'] = "Text cannot be empty";
         }
@@ -27,7 +27,7 @@ class Post extends TableRecord
         $sql = "SELECT * FROM `posts` WHERE u_id= ? ORDER BY p_date DESC";
         $posts = $al->query($sql, [$id]);
         if (!$posts) {
-            return false;
+            return array();
         }
         return $posts;
     }

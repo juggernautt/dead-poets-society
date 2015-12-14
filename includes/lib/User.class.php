@@ -32,16 +32,6 @@ class User extends TableRecord
     }
 
 
-//    public function authorize($props)
-//    {
-//        $preds = array(
-//            'u_email' => $props['u_email'],
-//            'u_password' => md5($props['u_password'])
-//        );
-//        return $this->al->select_many($this->table, $preds);
-//    }
-
-
     public static function authorize($email, $password)
     {
         global $config;
@@ -62,7 +52,7 @@ class User extends TableRecord
         $sql = "SELECT * FROM `users` WHERE u_id!=? AND u_is_frozen_account != 1 ORDER BY `u_nickname` {$props['order_by']}";
         $users = $al->query($sql, [$props['id']]);
         if (!$users) {
-            return false;
+            return array();
         }
         return $users;
     }
@@ -74,7 +64,7 @@ class User extends TableRecord
             WHERE r_status='FRIENDS' AND u_is_frozen_account != 1 AND u_id!= ? AND (u_id1= ? OR u_id2 = ?) ORDER BY  `u_nickname` {$props['order_by']}";
         $userFriends = $al->query($sql, [$props['id'], $props['id'], $props['id']]);
         if (!$userFriends) {
-            return false;
+            return array();
         }
         return $userFriends;
     }

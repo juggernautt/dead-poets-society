@@ -74,6 +74,10 @@ abstract class TableRecord
         return isset($this->props[$propName]) ? $this->props[$propName] : $defaultValue;
     }
 
+    public function getErrors() {
+        return array();
+    }
+
     /**
      * @return true | array with errors
      */

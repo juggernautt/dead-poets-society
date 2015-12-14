@@ -94,7 +94,7 @@ class Relationship extends TableRecord
         $sql = "SELECT * FROM  `users` LEFT JOIN `relationship` ON users.u_id=relationship.u_id1 WHERE r_status='REQUEST_SENT' AND u_id2= ? AND u_is_frozen_account != 1";
         $requests = $al->query($sql, [$id]);
         if (!$requests) {
-            return false;
+            return array();
         }
         return $requests;
     }
@@ -106,7 +106,7 @@ class Relationship extends TableRecord
         $sql = "SELECT * FROM  `users` LEFT JOIN `relationship` ON users.u_id=relationship.u_id2 WHERE r_status='DECLINED' AND u_is_frozen_account != 1 AND u_id1= ? ";
         $declines = $al->query($sql, [$id]);
         if (!$declines) {
-            return false;
+            return array();
         }
         return $declines;
     }
@@ -115,8 +115,10 @@ class Relationship extends TableRecord
     {
         $errors = array();
         if (!$this->primary_key_value) {
-            // try to select .u_id1, u_id2 OR u_id2, u_id1
-            // if found $errors['u_id1'] = "pair already exists"
+            $res = Relationship::getRelationship($this->props['u_id1'], $this->props['u_id2']);
+            if($res) {
+                $errors['u_id1'] = "Pair already exists";
+            }
         }
         return $errors;
 
