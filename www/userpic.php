@@ -7,8 +7,8 @@ session_start();
 
 
 function is_user_permitted_to_see_the_file($id1, $id2) {
-    $props = array('my_id' => $id1, 'other_id' => $id2);
-    if($id1 === $id2 || getRelationshipStatus($props) === Relationship::FRIENDS) {
+
+    if($id1 === $id2 || getRelationshipStatus($id1, $id2) === Relationship::FRIENDS) {
         return true;
     }
     return false;

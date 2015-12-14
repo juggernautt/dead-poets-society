@@ -38,44 +38,49 @@ class Relationship extends TableRecord
     }
 
     /**
-     * @param array
+     * @param $my_id
+     * @param $other_id
      * @return array|bool
      */
-    public function getRelationship($props)
+    public static function getRelationship($my_id, $other_id)
     {
+        global $config;
+        $al = new AL($config['database']);
+
         $predicates1 = array(
-            'u_id1' => $props['my_id'],
-            'u_id2' => $props['other_id']
+            'u_id1' => $my_id,
+            'u_id2' => $other_id
 
         );
         $predicates2 = array(
-            'u_id1' => $props['other_id'],
-            'u_id2' => $props['my_id']
+            'u_id1' => $other_id,
+            'u_id2' => $my_id
         );
-        $res = $this->al->select_many($this->table, $predicates1);
-        return $res ? $res : $this->al->select_many($this->table, $predicates2);
+        $res = $al->select_many('relationship', $predicates1);
+        return $res ? $res : $al->select_many('relationship', $predicates2);
     }
 
 
-    public function getStatus($props)
+    public static function getStatus($my_id, $other_id)
     {
-        $result = $this->getRelationship($props);
+
+        $result = Relationship::getRelationship($my_id, $other_id);
         if(!$result) {
             return Relationship::NO_RELATIONSHIP;
         }
         if($result['r_status'] == 'FRIENDS') {
             return Relationship::FRIENDS;
         }
-        if($result['r_status'] == 'REQUEST_SENT' && $result['u_id1'] == $props['my_id']) {
+        if($result['r_status'] == 'REQUEST_SENT' && $result['u_id1'] == $my_id) {
             return Relationship::MINE_REQUEST;
         }
-        if($result['r_status'] == 'REQUEST_SENT' && $result['u_id2'] == $props['my_id']) {
+        if($result['r_status'] == 'REQUEST_SENT' && $result['u_id2'] == $my_id) {
             return Relationship::HIS_REQUEST;
         }
-        if($result['r_status'] == 'DECLINED' && $result['u_id1'] == $props['my_id']) {
+        if($result['r_status'] == 'DECLINED' && $result['u_id1'] == $my_id) {
             return Relationship::MINE_DECLINE;
         }
-        if($result['r_status'] == 'DECLINED' && $result['u_id2'] == $props['my_id']) {
+        if($result['r_status'] == 'DECLINED' && $result['u_id2'] == $my_id) {
             return Relationship::HIS_DECLINE;
         }
         return null;
@@ -106,6 +111,16 @@ class Relationship extends TableRecord
         return $declines;
     }
 
+    public function getErrors()
+    {
+        $errors = array();
+        if (!$this->primary_key_value) {
+            // try to select .u_id1, u_id2 OR u_id2, u_id1
+            // if found $errors['u_id1'] = "pair already exists"
+        }
+        return $errors;
+
+    }
 
 
 }

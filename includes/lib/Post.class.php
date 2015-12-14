@@ -14,10 +14,11 @@ class Post extends TableRecord
 
 
     public function getErrors() {
+        $errors = [];
         if($this->props['p_text'] == "") {
-            return false;
+            $errors['p_text'] = "Text cannot be empty";
         }
-        return true;
+        return $errors;
     }
 
     public static function selectAll($id) {

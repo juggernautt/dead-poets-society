@@ -20,8 +20,12 @@ function selectUser($u_id)
 function createNewPost($props)
 {
     $p = new Post($props);
-    $p->save();
-    return $p->getProps(TRUE);
+    $res = $p->save();
+    if ($res) {
+        return $p->getProps(TRUE);
+    } else {
+        return false;
+    }
 }
 
 /**
@@ -61,7 +65,7 @@ function isDeactivated($u_id)
  */
 function addFriend($props)
 {
-    $r = new Relationship($props);
+    $r = new Relationship($props); // $props = ['u_id1' => %num%, 'u_id2' => %num%, 'r_status' => %string%]
     $r->save();
     return $r->getProps(TRUE);
 }
@@ -173,8 +177,12 @@ function selectEmailAndPasswordLogInProcess($props)
 function addNewUser($props)
 {
     $u = new User($props);
-    $u->save();
-    return $u->getProps(TRUE);
+    $res = $u->save();
+    if ($res) {
+        return $u->getProps(TRUE);
+    } else {
+        return $res;
+    }
 }
 
 
@@ -188,20 +196,19 @@ function updateExistingUser($props)
 
 
 
-function getRelationship($props)
+function getRelationship($my_id, $other_id)
 {
-    $r = new Relationship();
-    return $r->getRelationship($props);
+   return Relationship::getRecord($my_id, $other_id);
 }
 
 /**
- * @param array
+ * @param $my_id
+ * @param $other_id
  * @return string
  */
-function getRelationshipStatus($props)
+function getRelationshipStatus($my_id, $other_id)
 {
-    $r = new Relationship();
-    return $r->getStatus($props);
+    return Relationship::getStatus($my_id, $other_id);
 }
 
 

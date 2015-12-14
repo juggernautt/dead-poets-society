@@ -75,10 +75,15 @@ abstract class TableRecord
     }
 
     /**
-     * @return boolean
+     * @return true | array with errors
      */
     public function save()
     {
+        $errors = $this->getErrors();
+        if (count($errors)) {
+            return $errors;
+        }
+
         if($this->primary_key_value === null) {
             $record = $this->al->insert_one($this->table, $this->props);
             if (!$record) {

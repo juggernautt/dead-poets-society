@@ -13,9 +13,9 @@ $relationship = null;
 if (isset($_GET['u_id'])) {
     $user = selectUser($_GET['u_id']);
     $mineProfile = false;
-    $props = array('my_id' => $_SESSION['loggedInUser']['u_id'], 'other_id' => $_GET['u_id']);
-    $relationship = getRelationshipStatus($props);
-    $rr = getRelationship($props);
+    $relationship = getRelationshipStatus($_SESSION['loggedInUser']['u_id'], $_GET['u_id']);
+
+    $rr = getRelationship($_SESSION['loggedInUser']['u_id'], $_GET['u_id']);
 } else {
     //index of a currently logged in user
     $user = selectUser($_SESSION['loggedInUser']['u_id']);
