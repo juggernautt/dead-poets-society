@@ -39,7 +39,7 @@ if ($action == "Accept")
     $result = array(
         'u_about_myself' => $acceptedUser['u_about_myself'],
         //'u_secret_pic' => $acceptedUser['u_secret_pic'],
-        'u_id' => $_POST['u_id'],
+        'u_id' => $acceptedUser['u_id'],
         'days' => calculateDaysTillTheDate($acceptedUser['u_birthdate'])
     );
     print json_encode($result);
