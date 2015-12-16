@@ -38,7 +38,6 @@ if ($action == "Accept")
     $acceptedUser = acceptFriendship($props);
     $result = array(
         'u_about_myself' => $acceptedUser['u_about_myself'],
-        //'u_secret_pic' => $acceptedUser['u_secret_pic'],
         'u_id' => $acceptedUser['u_id'],
         'days' => calculateDaysTillTheDate($acceptedUser['u_birthdate'])
     );
@@ -48,7 +47,7 @@ if ($action == "Accept")
 
 if ($action == "Add Friend")
 {
-    $props = array('u_id1' => $_SESSION['loggedInUser']['u_id'], 'u_id2' => $_POST['u_id'], 'r_status' => 'REQUEST_SENT', 'r_updated_at' => date('d/m/Y'));
+    $props = array('u_id1' => $_SESSION['loggedInUser']['u_id'], 'u_id2' => $_POST['u_id'], 'r_status' => 'REQUEST_SENT', 'r_updated_at' => date('Y-m-d H:i:s'));
     $addedFriend = addFriend($props);
     print json_encode($addedFriend);
     return;
@@ -56,7 +55,7 @@ if ($action == "Add Friend")
 
 if ($action == "Decline")
 {
-    $props = array('u_id' => $_POST['u_id'], 'r_id' => $_POST['r_id']);
+    $props = array('u_id' => $_POST['u_id'], 'r_id' => $_POST['r_id'], 'r_updated_at' => date('Y-m-d H:i:s'));
     declineFriendship($props);
     print json_encode($_POST['u_id']);
     return;
