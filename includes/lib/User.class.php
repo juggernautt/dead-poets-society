@@ -72,7 +72,7 @@ class User extends TableRecord
 
 
 
-    public function getErrors($isToCheckMail)
+    public function getErrors()
     {
         $errors = array();
         if ($this->props['u_email'] == "" || $this->props['u_password'] == "" || $this->props['u_nickname'] == "" || $this->props['u_birthdate'] == "") {
@@ -82,9 +82,9 @@ class User extends TableRecord
             $errors['u_password'] = "Only letters and numbers allowed";
         }
 
-        if ($isToCheckMail) {
+        if (!$this->primary_key_value) {
             $users = $this->al->select_many('users', ['u_email' => $this->props['u_email']]);
-            if (count($users)) {
+            if ($users) {
                 $errors['u_email'] = "Your email should be unique";
             }
         }
