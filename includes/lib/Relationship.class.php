@@ -21,14 +21,19 @@ class Relationship extends TableRecord
 
     public function acceptOrRegret()
     {
-
         $this->setProp('r_status', 'FRIENDS');
         return $this->save();
     }
 
     public function decline()
     {
-        $this->setProp('r_status', 'DECLINED');
+        $props = array(
+            'u_id1' => $this->props['u_id2'],
+            'u_id2' => $this->props['u_id1'],
+            'r_status' => 'DECLINED',
+            'r_updated_at' => date('Y-m-d H:i:s')
+        );
+        $this->setProps($props);
         return $this->save();
     }
 
