@@ -23,7 +23,7 @@ require_once($_SERVER['DOCUMENT_ROOT'] . '/../includes/init.php');
         <div>
             <?php if (isset($_SESSION['loggedInUser'])) { ?>
                 <span class="logout">
-                    <img src="<?= getUserPic($_SESSION['loggedInUser']['u_picture']); ?>" width="35"
+                    <img src="/userpic.php?u_id=<?=$_SESSION['loggedInUser']['u_id']?>&type=public" width="35"
                          height="45"><?= $_SESSION['loggedInUser']['u_nickname']; ?>
                     <a href="/logout.php">Log out</a>
             </span>

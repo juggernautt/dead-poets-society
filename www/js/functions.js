@@ -57,18 +57,19 @@ $(document).ready(function() {
 
     //clicking on accept button, show secret data and show unfriend button. index page
     relationshipButtonsIndex.on('click', '[action=accept]', function() {
-        var id =  $('#u_id').val();
-        var data2send = {
-            u_id: id,
-            action: "Accept"
-        };
+        var u_id =  $('#u_id').val(),
+            r_id =  $('#r_id').val(),
+            data2send = {
+                u_id: u_id,
+                r_id: r_id,
+                action: "Accept"
+            };
         var successCallback = function(serverResult) {
-            debugger;
             if(serverResult) {
-                debugger;
                 console.log(serverResult);
                 var button = $('<input type="button" id="unfriend" name="action" class="btn btn-danger" action="unfriend" value="Unfriend">'),
-                    imgSrc = serverResult['u_secret_pic'],
+                    imgSrc = "/userpic.php?u_id=" + serverResult['u_id'] + "&type=private",
+                    //imgSrc = serverResult['u_secret_pic'],
                     text = serverResult['u_about_myself'],
                     daysTillBirthday = serverResult['days'],
                     div = $('<div class="secret"><img src="' + imgSrc + '" width="170" height="235" alt="secret-picture">' +
@@ -87,9 +88,11 @@ $(document).ready(function() {
 
     //clicking on decline button, show decline message. index page
     relationshipButtonsIndex.on('click', '[action=decline]', function() {
-        var id =  $('#u_id').val();
-        var data2send = {
-            u_id: id,
+        var u_id =  $('#u_id').val(),
+            r_id =  $('#r_id').val(),
+            data2send = {
+            u_id: u_id,
+            r_id: r_id,
             action: "Decline"
         };
         var successCallback = function(serverResult) {
@@ -110,11 +113,13 @@ $(document).ready(function() {
 
     //clicking on unfriend button, hide secret data and show add friend button. index page
     relationshipButtonsIndex.on('click', '[action=unfriend]',function() {
-        var id =  $('#u_id').val();
-        var data2send = {
-            u_id: id,
-            action: "Unfriend"
-        };
+        var u_id =  $('#u_id').val(),
+            r_id =  $('#r_id').val(),
+            data2send = {
+                u_id: u_id,
+                r_id: r_id,
+                action: "Unfriend"
+            };
 
         var successCallback = function(serverResult) {
             if(serverResult) {
@@ -162,11 +167,13 @@ $(document).ready(function() {
 
     //clicking on unfriend button remove the div from relationship page
     friendsDiv.on('click', '[action=unfriend]', function() {
-        var id = $(this).parent().find('input[type=hidden]').val();
-        var data2send = {
-            u_id: id,
-            action: "Unfriend"
-        };
+        var u_id = $(this).parent().find('.u_id').val(),
+            r_id = $(this).parent().find('.r_id').val(),
+            data2send = {
+                u_id: u_id,
+                r_id: r_id,
+                action: "Unfriend"
+            };
         var successCallback = function(serverResult) {
             if(serverResult) {
                 var div = $('[u_id=' + serverResult + ']');
@@ -178,9 +185,11 @@ $(document).ready(function() {
 
     //when clicking on regret button the user will become a friend and move to the friends list. relationship page
     declinesDiv.on('click', '[action=regret]', function() {
-        var id = $(this).parent().find('input[type=hidden]').val(),
+        var r_id = $(this).parent().find('.r_id').val(),
+            u_id = $(this).parent().find('.u_id').val(),
             data2send = {
-                u_id: id,
+                r_id: r_id,
+                u_id: u_id,
                 action: "Regret button"
             };
         var successCallback = function(serverResult) {
@@ -200,9 +209,11 @@ $(document).ready(function() {
     });
     //when clicking on decline button the user will move to the decline list. relationship page
     requestDiv.on('click', '[action=decline]', function() {
-        var id = $(this).parent().find('input[type=hidden]').val(),
+        var r_id = $(this).parent().find('.r_id').val(),
+            u_id = $(this).parent().find('.u_id').val(),
             data2send = {
-                u_id: id,
+                u_id: u_id,
+                r_id: r_id,
                 action: "Decline"
             };
         var successCallback = function(serverResult) {
@@ -222,9 +233,11 @@ $(document).ready(function() {
     });
     //when clicking on accept button the user will move to friend list. relationship page
     requestDiv.on('click', '[action=accept]', function() {
-        var id = $(this).parent().find('input[type=hidden]').val(),
+        var r_id = $(this).parent().find('.r_id').val(),
+            u_id = $(this).parent().find('.u_id').val(),
             data2send = {
-                u_id: id,
+                r_id: r_id,
+                u_id: u_id,
                 action: "Accept"
             };
         var successCallback = function(serverResult) {

@@ -24,13 +24,14 @@ is_logged_in();
                     foreach ($requests as $request) { ?>
                         <div class="relationship" u_id="<?= $request['u_id']; ?>">
                             <a href="/index.php?u_id=<?= $request['u_id']; ?>">
-                                <img src="<?= getUserPic($request['u_picture']); ?>" width="150" height="170">
+                                <img src="/userpic.php?u_id=<?=$request['u_id']?>&type=public" width="150" height="170">
                             </a>
 
                             <p><?= $request['u_nickname']; ?></p>
 
                             <form method="post">
-                                <input type="hidden" name="u_id" value="<?= $request['u_id']; ?>">
+                                <input type="hidden" name="r_id" class="r_id" value="<?= $request['r_id']; ?>">
+                                <input type="hidden" name="u_id" class="u_id" value="<?= $request['u_id']; ?>">
                                 <input type="button" class="btn btn-default" name="action" value="Accept"
                                        action="accept">
                                 <input type="button" class="btn btn-danger" name="action" value="Decline"
@@ -46,18 +47,20 @@ is_logged_in();
 
                     <?php
                     //list of the user's friends. each item contains unfriend button(delete friendship)
-                    $friends = selectActiveUserFriends($_SESSION['loggedInUser']['u_id'], "ASC");
+                    $props = array('id' => $_SESSION['loggedInUser']['u_id'], 'order_by' => "ASC");
+                    $friends = selectActiveUserFriends($props);
 
                     foreach ($friends as $friend) { ?>
                         <div class="relationship" u_id="<?= $friend['u_id'] ?>">
                             <a href="/index.php?u_id=<?= $friend['u_id']; ?>">
-                                <img src="<?= getUserPic($friend['u_picture']); ?>" width="150" height="170">
+                                <img src="/userpic.php?u_id=<?=$friend['u_id']?>&type=public" width="150" height="170">
                             </a>
 
                             <p><?= $friend['u_nickname']; ?></p>
 
                             <form method="post">
-                                <input type="hidden" name="u_id" value="<?= $friend['u_id']; ?>">
+                                <input type="hidden" name="u_id" class="u_id" value="<?= $friend['u_id']; ?>">
+                                <input type="hidden" name="r_id" class="r_id" value="<?= $friend['r_id']; ?>">
                                 <input type="button" class="btn btn-danger" name="action" value="Unfriend"
                                        action="unfriend">
                             </form>
@@ -77,13 +80,14 @@ is_logged_in();
                     foreach ($declines as $decline) { ?>
                         <div class="relationship" u_id="<?= $decline['u_id'] ?>">
                             <a href="/index.php?u_id=<?= $decline['u_id']; ?>">
-                                <img src="<?= getUserPic($decline['u_picture']); ?>" width="150" height="170">
+                                <img src="/userpic.php?u_id=<?=$decline['u_id']?>&type=public" width="150" height="170">
                             </a>
 
                             <p><?= $decline['u_nickname']; ?></p>
 
                             <form method="post">
-                                <input type="hidden" name="u_id" value="<?= $decline['u_id']; ?>">
+                                <input type="hidden" name="r_id" class="r_id" value="<?= $decline['r_id']; ?>">
+                                <input type="hidden" name="u_id" class="u_id" value="<?= $decline['u_id']; ?>">
                                 <input type="button" class="btn btn-default" name="action" value="Regret button"
                                        action="regret">
                             </form>

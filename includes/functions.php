@@ -16,32 +16,31 @@ function redirect($location)
 }
 
 
+
+
 function is_logged_in()
 {
     if (!isset($_SESSION['loggedInUser'])) {
         redirect('/login.php');
+        return false;
     }
+    return true;
 }
 
 
 
 function move_files($file)
 {
-    $destination = "";
+    $name = "";
     if ($file['type'] == 'image/jpeg') {
         $tmp_name = $file["tmp_name"];
-        $name = $file["name"];
-        $destination = 'images/user_uploads/' . uniqid() . $name;
-        move_uploaded_file($tmp_name, $destination);
+        $name = uniqid() . $file["name"];
+        $destination = '../user_uploads/';
+        move_uploaded_file($tmp_name, $destination . $name);
     }
-    return $destination;
+    return $name;
 }
 
-
-function getUserPic($pictureSrc) {
-    $src = ($pictureSrc != "") ? $pictureSrc : "images/anonymous.jpg";
-    return $src;
-}
 
 function calculateDaysTillTheDate($date)
 {
@@ -75,3 +74,4 @@ function getRandomQuote()
     return $quotes[$result];
 
 }
+

@@ -8,11 +8,12 @@ require_once('lib/businessLogic.php');
 is_logged_in();
 
 //show all users
+$props = array('id' => $_SESSION['loggedInUser']['u_id'], 'order_by' => "ASC");
 if ($_GET['show'] == 'all') {
-    $users = selectAllActiveUsers($_SESSION['loggedInUser']['u_id'], "ASC");
+    $users = selectAllActiveUsers($props);
 } else {
     //show only user friends
-    $users = selectActiveUserFriends($_SESSION['loggedInUser']['u_id'], "ASC");
+    $users = selectActiveUserFriends($props);
 }
 
 ?>
@@ -37,7 +38,7 @@ if ($_GET['show'] == 'all') {
 
                         <div class="user">
                             <a href="/index.php?u_id=<?= $user['u_id']; ?>">
-                                <img src="<?= getUserPic($user['u_picture']); ?>" width="150" height="167">
+                                <img src="/userpic.php?u_id=<?=$user['u_id']?>&type=public" width="150" height="167">
                             </a>
 
                             <p class="nickname"><?= $user['u_nickname']; ?></p>

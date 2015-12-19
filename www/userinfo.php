@@ -74,16 +74,12 @@ if (isset($_SESSION['loggedInUser'])) {
                 <div class="form-group">
                     <label for="file1">File input</label>
                     <input type="file" id="file1" name="file1">
-                    <?php if (isset($user['u_picture'])) { ?>
-                        <img src="<?= $user['u_picture']; ?>">
-                    <?php } ?>
+                    <img src="/userpic.php?u_id=<?=$user['u_id']?>&type=public" width="170" height="235" alt="public-picture">
                 </div>
                 <div class="form-group">
                     <label for="file2">File input</label>
                     <input type="file" id="file2" name="file2">
-                    <?php if (isset($user['u_secret_pic'])) { ?>
-                        <img src="<?= $user['u_secret_pic']; ?>">
-                    <?php } ?>
+                    <img src="/userpic.php?u_id=<?=$user['u_id']?>&type=private" width="170" height="235" alt="secret-picture">
                 </div>
                 <div class="form-group">
                     <input type="hidden" class="form-control" id="id" name="u_id"

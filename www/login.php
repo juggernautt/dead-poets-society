@@ -10,7 +10,7 @@ if ($_POST) {
     $user = array();
     $user['u_email'] = $_POST['u_email'];
     $user['u_password'] = $_POST['u_password'];
-    $userArr = selectEmailAndPasswordLogInProcess($user['u_email'], $user['u_password']);
+    $userArr = selectEmailAndPasswordLogInProcess($user);
 
     //invalid email or password
     if (!$userArr) {

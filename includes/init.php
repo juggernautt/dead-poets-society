@@ -11,5 +11,6 @@ set_include_path($new_include_path);
 
 date_default_timezone_set('Asia/Jerusalem');
 
+require_once('config.php');
 require_once('functions.php');
 require_once('constants.php');
